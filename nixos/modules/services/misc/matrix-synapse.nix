@@ -105,7 +105,7 @@ perspectives:
     '') cfg.servers)}
     }
   }
-redaction_retention_period: ${toString cfg.redaction_retention_period}
+redaction_retention_period: ${builtins.toJSON cfg.redaction_retention_period}
 app_service_config_files: ${builtins.toJSON cfg.app_service_config_files}
 
 ${cfg.extraConfig}
@@ -601,10 +601,11 @@ in {
         '';
       };
       redaction_retention_period = mkOption {
-        type = types.int;
+        type = types.nullOr types.int;
         default = 7;
         description = ''
           How long to keep redacted events in unredacted form in the database.
+          Set to null to keep indefinitely.
         '';
       };
       extraConfig = mkOption {
