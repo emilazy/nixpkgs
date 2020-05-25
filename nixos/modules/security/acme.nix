@@ -6,6 +6,22 @@ let
 
   certSubmodule = { name, ... }: {
     options = {
+      server = lib.mkOption {
+        type = types.nullOr types.str;
+        default = cfg.server;
+        description = ''
+          ACME Directory Resource URI. Defaults to Let's Encrypt
+          production endpoint,
+          https://acme-v02.api.letsencrypt.org/directory, if unset.
+        '';
+      };
+
+      email = lib.mkOption {
+        type = types.nullOr types.str;
+        default = cfg.email;
+        description = "Contact email address for the CA to be able to reach you.";
+      };
+
       webroot = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
@@ -19,26 +35,10 @@ let
         '';
       };
 
-      server = lib.mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        description = ''
-          ACME Directory Resource URI. Defaults to let's encrypt
-          production endpoint,
-          https://acme-v02.api.letsencrypt.org/directory, if unset.
-        '';
-      };
-
       domain = lib.mkOption {
         type = types.str;
         default = name;
         description = "Domain to fetch certificate for (defaults to the entry name)";
-      };
-
-      email = lib.mkOption {
-        type = types.nullOr types.str;
-        default = cfg.email;
-        description = "Contact email address for the CA to be able to reach you.";
       };
 
       user = lib.mkOption {
@@ -206,7 +206,7 @@ in
         type = types.nullOr types.str;
         default = null;
         description = ''
-          ACME Directory Resource URI. Defaults to let's encrypt
+          ACME Directory Resource URI. Defaults to Let's Encrypt
           production endpoint,
           <literal>https://acme-v02.api.letsencrypt.org/directory</literal>, if unset.
         '';
@@ -308,7 +308,7 @@ in
               ++ lib.optionals (certCfg.dnsProvider != null && !certCfg.dnsPropagationCheck) [ "--dns.disable-cp" ]
               ++ lib.concatLists (lib.mapAttrsToList (name: root: [ "-d" name ]) certCfg.extraDomains)
               ++ (if certCfg.dnsProvider != null then [ "--dns" certCfg.dnsProvider ] else [ "--http" "--http.webroot" certCfg.webroot ])
-              ++ lib.optionals (cfg.server != null || certCfg.server != null) [ "--server" (if certCfg.server == null then cfg.server else certCfg.server) ];
+              ++ lib.optionals (certCfg.server != null) [ "--server" certCfg.server ];
             certOpts = lib.optionals certCfg.ocspMustStaple [ "--must-staple" ];
             runOpts = lib.escapeShellArgs (globalOpts ++ [ "run" ] ++ certOpts);
             renewOpts = lib.escapeShellArgs (globalOpts ++
