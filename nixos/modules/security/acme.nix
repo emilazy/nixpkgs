@@ -4,7 +4,7 @@ let
 
   cfg = config.security.acme;
 
-  certSubmodule = { name, ... }: {
+  certSubmodule = { name, config, ... }: {
     options = {
       server = lib.mkOption {
         type = types.nullOr types.str;
@@ -20,19 +20,6 @@ let
         type = types.nullOr types.str;
         default = cfg.email;
         description = "Contact email address for the CA to be able to reach you.";
-      };
-
-      webroot = lib.mkOption {
-        type = types.nullOr types.str;
-        default = null;
-        example = "/var/lib/acme/acme-challenges";
-        description = ''
-          Where the webroot of the HTTP vhost is located.
-          <filename>.well-known/acme-challenge/</filename> directory
-          will be created below the webroot if it doesn't exist.
-          <literal>http://example.org/.well-known/acme-challenge/</literal> must also
-          be available (notice unencrypted HTTP).
-        '';
       };
 
       domain = lib.mkOption {
@@ -106,6 +93,44 @@ let
           at https://go-acme.github.io/lego/usage/cli/#usage.
         '';
       };
+
+      challenge.type = lib.mkOption {
+        type = types.enum [ "http-01" "dns-01" ];
+        # This default is for backwards compatibility.
+        default =
+          if config.dnsProvider != null
+          then "dns-01"
+          else if config.webroot != null
+          then "http-01"
+          else null;
+        description = ''
+          The ACME challenge type to use, in lowercase. Currently
+          supported are <literal>http-01</literal>
+          and <literal>dns-01</literal>.
+        '';
+      };
+
+      # TODO: Make challenge options hierarchical and deprecate the old
+      # option names.
+      #
+      # e.g. challenge.dns-01.provider
+
+      # HTTP-01 challenge options
+
+      webroot = lib.mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        example = "/var/lib/acme/acme-challenges";
+        description = ''
+          Where the webroot of the HTTP vhost is located.
+          <filename>.well-known/acme-challenge/</filename> directory
+          will be created below the webroot if it doesn't exist.
+          <literal>http://example.org/.well-known/acme-challenge/</literal> must also
+          be available (notice unencrypted HTTP).
+        '';
+      };
+
+      # DNS-01 challenge options
 
       dnsProvider = lib.mkOption {
         type = types.nullOr types.str;
@@ -265,23 +290,52 @@ in
   config = lib.mkIf (cfg.certs != { }) {
     assertions =
       let
-        certs = (lib.mapAttrsToList (k: v: v) cfg.certs);
+        challengeOptions = {
+          http-01 = "webroot";
+          dns-01 = "dnsProvider";
+        };
+
+        certAssertions = cert:
+          let
+            certCfg = cfg.certs.${cert};
+            certOptionPrefix =
+              "security.acme.certs.${lib.strings.escapeNixString cert}";
+            challengeAssertions = challengeType: option:
+              if challengeType == certCfg.challenge.type then {
+                assertion = certCfg.${option} != null;
+                message = ''
+                  ACME challenge type "${challengeType}" requires the
+                  `${certOptionPrefix}.${option}` option to be set.
+                '';
+              } else {
+                assertion = certCfg.${option} == null;
+                message = ''
+                  The option `${certOptionPrefix}.${option}` is only
+                  valid for ACME challenge type "${challengeType}". The
+                  currently-set challenge type for ${cert}
+                  is "${certCfg.challenge.type}".
+                '';
+              };
+          in
+          [
+            {
+              assertion = certCfg.email != null;
+              message = ''
+                You must define `security.acme.email` or
+                `${certOptionPrefix}.email` to register with the CA.
+              '';
+            }
+
+            {
+              assertion = certCfg.challenge.type != null;
+              message = ''
+                You must specify an ACME challenge type with
+                `${certOptionPrefix}.challenge.type`.
+              '';
+            }
+          ] ++ lib.mapAttrsToList challengeAssertions challengeOptions;
       in
       [
-        {
-          assertion = lib.all (certCfg: certCfg.dnsProvider == null || certCfg.webroot == null) certs;
-          message = ''
-            Options `security.acme.certs.<name>.dnsProvider` and
-            `security.acme.certs.<name>.webroot` are mutually exclusive.
-          '';
-        }
-        {
-          assertion = cfg.email != null || lib.all (certCfg: certCfg.email != null) certs;
-          message = ''
-            You must define `security.acme.certs.<name>.email` or
-            `security.acme.email` to register with the CA.
-          '';
-        }
         {
           assertion = cfg.acceptTerms;
           message = ''
@@ -290,7 +344,7 @@ in
             to `true`. For Let's Encrypt's ToS see https://letsencrypt.org/repository/
           '';
         }
-      ];
+      ] ++ lib.concatMap certAssertions (lib.attrNames cfg.certs);
 
     systemd.services =
       let
@@ -316,11 +370,6 @@ in
               path = ".";
             } // challengeOpts;
 
-            challengeType =
-              if certCfg.dnsProvider != null
-              then "dns-01"
-              else "http-01";
-
             challengeOpts = {
               dns-01 = {
                 dns = certCfg.dnsProvider;
@@ -330,7 +379,7 @@ in
                 http = true;
                 "http.webroot" = certCfg.webroot;
               };
-            }.${challengeType};
+            }.${certCfg.challenge.type};
 
             certOpts = {
               must-staple = certCfg.ocspMustStaple;
@@ -367,7 +416,7 @@ in
               WorkingDirectory = spath;
               # Only try loading the credentialsFile if the dns challenge is enabled
               EnvironmentFile =
-                if challengeType == "dns-01"
+                if certCfg.challenge.type == "dns-01"
                 then certCfg.credentialsFile
                 else null;
             };

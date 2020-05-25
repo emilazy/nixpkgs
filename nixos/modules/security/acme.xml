@@ -160,6 +160,7 @@ services.httpd = {
 
 <programlisting>
 <xref linkend="opt-security.acme.certs"/>."foo.example.com" = {
+  <link linkend="opt-security.acme.certs._name_.challenge.type">challenge.type</link> = "http-01";
   <link linkend="opt-security.acme.certs._name_.webroot">webroot</link> = "/var/lib/acme/.challenges";
   <link linkend="opt-security.acme.certs._name_.email">email</link> = "foo@example.com";
   # Since we have a wildcard vhost to handle port 80,
@@ -221,6 +222,7 @@ services.acme-dns = {
 <xref linkend="opt-security.acme.email" /> = "admin+acme@example.com";
 <xref linkend="opt-security.acme.certs" />."example.com" = {
   <link linkend="opt-security.acme.certs._name_.domain">domain</link> = "*.example.com";
+  <link linkend="opt-security.acme.certs._name_.challenge.type">challenge.type</link> = "dns-01";
   <link linkend="opt-security.acme.certs._name_.dnsProvider">dnsProvider</link> = "rfc2136";
   <link linkend="opt-security.acme.certs._name_.credentialsFile">credentialsFile</link> = pkgs.writeText "lego-example.com.env" ''
     ACME_DNS_API_BASE=http://localhost:8053

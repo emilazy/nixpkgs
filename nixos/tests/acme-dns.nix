@@ -94,6 +94,7 @@ import ./make-test-python.nix ({ lib, ... }: {
           domain = "*.example.test";
           user = "nginx";
           group = "nginx";
+          challenge.type = "dns-01";
           dnsProvider = "acme-dns";
           credentialsFile = pkgs.writeText "lego-example.test.env" ''
             ACME_DNS_API_BASE=http://acme-dns.test:8053

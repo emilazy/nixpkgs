@@ -46,6 +46,7 @@ in import ./make-test-python.nix ({ lib, ... }: {
       ];
       networking.firewall.allowedTCPPorts = [ 80 ];
       security.acme.certs."standalone.test" = {
+        challenge.type = "http-01";
         webroot = "/var/lib/acme/acme-challenges";
       };
       systemd.targets."acme-finished-standalone.test" = {};
@@ -107,6 +108,7 @@ in import ./make-test-python.nix ({ lib, ... }: {
       specialisation.dns-01.configuration = {pkgs, config, nodes, lib, ...}: {
         security.acme.certs."example.test" = {
           domain = "*.example.test";
+          challenge.type = "dns-01";
           dnsProvider = "exec";
           dnsPropagationCheck = false;
           credentialsFile = with pkgs; writeText "wildcard.env" ''
