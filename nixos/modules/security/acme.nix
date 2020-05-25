@@ -1,11 +1,12 @@
 { config, lib, pkgs, ... }:
-with lib;
 let
+  inherit (lib) types;
+
   cfg = config.security.acme;
 
   certSubmodule = { name, ... }: {
     options = {
-      webroot = mkOption {
+      webroot = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         example = "/var/lib/acme/acme-challenges";
@@ -18,7 +19,7 @@ let
         '';
       };
 
-      server = mkOption {
+      server = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         description = ''
@@ -28,31 +29,31 @@ let
         '';
       };
 
-      domain = mkOption {
+      domain = lib.mkOption {
         type = types.str;
         default = name;
         description = "Domain to fetch certificate for (defaults to the entry name)";
       };
 
-      email = mkOption {
+      email = lib.mkOption {
         type = types.nullOr types.str;
         default = cfg.email;
         description = "Contact email address for the CA to be able to reach you.";
       };
 
-      user = mkOption {
+      user = lib.mkOption {
         type = types.str;
         default = "root";
         description = "User running the ACME client.";
       };
 
-      group = mkOption {
+      group = lib.mkOption {
         type = types.str;
         default = "root";
         description = "Group running the ACME client.";
       };
 
-      allowKeysForGroup = mkOption {
+      allowKeysForGroup = lib.mkOption {
         type = types.bool;
         default = false;
         description = ''
@@ -61,7 +62,7 @@ let
         '';
       };
 
-      postRun = mkOption {
+      postRun = lib.mkOption {
         type = types.lines;
         default = "";
         example = "systemctl reload nginx.service";
@@ -74,17 +75,17 @@ let
         '';
       };
 
-      directory = mkOption {
+      directory = lib.mkOption {
         type = types.str;
         readOnly = true;
         default = "/var/lib/acme/${name}";
         description = "Directory where certificate and other state is stored.";
       };
 
-      extraDomains = mkOption {
+      extraDomains = lib.mkOption {
         type = types.attrsOf (types.nullOr types.str);
         default = { };
-        example = literalExample ''
+        example = lib.literalExample ''
           {
             "example.org" = null;
             "mydomain.org" = null;
@@ -96,7 +97,7 @@ let
         '';
       };
 
-      keyType = mkOption {
+      keyType = lib.mkOption {
         type = types.str;
         default = "ec256";
         description = ''
@@ -106,7 +107,7 @@ let
         '';
       };
 
-      dnsProvider = mkOption {
+      dnsProvider = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         example = "route53";
@@ -116,7 +117,7 @@ let
         '';
       };
 
-      credentialsFile = mkOption {
+      credentialsFile = lib.mkOption {
         type = types.path;
         description = ''
           Path to an EnvironmentFile for the cert's service containing any required and
@@ -127,7 +128,7 @@ let
         example = "/var/src/secrets/example.org-route53-api-token";
       };
 
-      dnsPropagationCheck = mkOption {
+      dnsPropagationCheck = lib.mkOption {
         type = types.bool;
         default = true;
         description = ''
@@ -136,7 +137,7 @@ let
         '';
       };
 
-      ocspMustStaple = mkOption {
+      ocspMustStaple = lib.mkOption {
         type = types.bool;
         default = false;
         description = ''
@@ -149,7 +150,7 @@ let
         '';
       };
 
-      extraLegoRenewFlags = mkOption {
+      extraLegoRenewFlags = lib.mkOption {
         type = types.listOf types.str;
         default = [ ];
         description = ''
@@ -164,34 +165,34 @@ in
 
   ###### interface
   imports = [
-    (mkRemovedOptionModule [ "security" "acme" "production" ] ''
+    (lib.mkRemovedOptionModule [ "security" "acme" "production" ] ''
       Use security.acme.server to define your staging ACME server URL instead.
 
       To use the let's encrypt staging server, use security.acme.server =
       "https://acme-staging-v02.api.letsencrypt.org/directory".
     ''
     )
-    (mkRemovedOptionModule [ "security" "acme" "directory" ] "ACME Directory is now hardcoded to /var/lib/acme and its permisisons are managed by systemd. See https://github.com/NixOS/nixpkgs/issues/53852 for more info.")
-    (mkRemovedOptionModule [ "security" "acme" "preDelay" ] "This option has been removed. If you want to make sure that something executes before certificates are provisioned, add a RequiredBy=acme-\${cert}.service to the service you want to execute before the cert renewal")
-    (mkRemovedOptionModule [ "security" "acme" "activationDelay" ] "This option has been removed. If you want to make sure that something executes before certificates are provisioned, add a RequiredBy=acme-\${cert}.service to the service you want to execute before the cert renewal")
-    (mkChangedOptionModule [ "security" "acme" "validMin" ] [ "security" "acme" "validMinDays" ] (config: config.security.acme.validMin / (24 * 3600)))
+    (lib.mkRemovedOptionModule [ "security" "acme" "directory" ] "ACME Directory is now hardcoded to /var/lib/acme and its permisisons are managed by systemd. See https://github.com/NixOS/nixpkgs/issues/53852 for more info.")
+    (lib.mkRemovedOptionModule [ "security" "acme" "preDelay" ] "This option has been removed. If you want to make sure that something executes before certificates are provisioned, add a RequiredBy=acme-\${cert}.service to the service you want to execute before the cert renewal")
+    (lib.mkRemovedOptionModule [ "security" "acme" "activationDelay" ] "This option has been removed. If you want to make sure that something executes before certificates are provisioned, add a RequiredBy=acme-\${cert}.service to the service you want to execute before the cert renewal")
+    (lib.mkChangedOptionModule [ "security" "acme" "validMin" ] [ "security" "acme" "validMinDays" ] (config: config.security.acme.validMin / (24 * 3600)))
   ];
   options = {
     security.acme = {
 
-      validMinDays = mkOption {
+      validMinDays = lib.mkOption {
         type = types.int;
         default = 30;
         description = "Minimum remaining validity before renewal in days.";
       };
 
-      email = mkOption {
+      email = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         description = "Contact email address for the CA to be able to reach you.";
       };
 
-      renewInterval = mkOption {
+      renewInterval = lib.mkOption {
         type = types.str;
         default = "daily";
         description = ''
@@ -201,7 +202,7 @@ in
         '';
       };
 
-      server = mkOption {
+      server = lib.mkOption {
         type = types.nullOr types.str;
         default = null;
         description = ''
@@ -211,7 +212,7 @@ in
         '';
       };
 
-      preliminarySelfsigned = mkOption {
+      preliminarySelfsigned = lib.mkOption {
         type = types.bool;
         default = true;
         description = ''
@@ -224,7 +225,7 @@ in
         '';
       };
 
-      acceptTerms = mkOption {
+      acceptTerms = lib.mkOption {
         type = types.bool;
         default = false;
         description = ''
@@ -233,9 +234,9 @@ in
         '';
       };
 
-      certs = mkOption {
+      certs = lib.mkOption {
         default = { };
-        type = with types; attrsOf (submodule certSubmodule);
+        type = types.attrsOf (types.submodule certSubmodule);
         description = ''
           Attribute set of certificates to get signed and renewed. Creates
           <literal>acme-''${cert}.{service,timer}</literal> systemd units for
@@ -243,7 +244,7 @@ in
           to those units if they rely on the certificates being present,
           or trigger restarts of the service if certificates get renewed.
         '';
-        example = literalExample ''
+        example = lib.literalExample ''
           {
             "example.com" = {
               webroot = "/var/www/challenges/";
@@ -261,21 +262,21 @@ in
   };
 
   ###### implementation
-  config = mkIf (cfg.certs != { }) {
+  config = lib.mkIf (cfg.certs != { }) {
     assertions =
       let
-        certs = (mapAttrsToList (k: v: v) cfg.certs);
+        certs = (lib.mapAttrsToList (k: v: v) cfg.certs);
       in
       [
         {
-          assertion = all (certCfg: certCfg.dnsProvider == null || certCfg.webroot == null) certs;
+          assertion = lib.all (certCfg: certCfg.dnsProvider == null || certCfg.webroot == null) certs;
           message = ''
             Options `security.acme.certs.<name>.dnsProvider` and
             `security.acme.certs.<name>.webroot` are mutually exclusive.
           '';
         }
         {
-          assertion = cfg.email != null || all (certCfg: certCfg.email != null) certs;
+          assertion = cfg.email != null || lib.all (certCfg: certCfg.email != null) certs;
           message = ''
             You must define `security.acme.certs.<name>.email` or
             `security.acme.email` to register with the CA.
@@ -293,8 +294,8 @@ in
 
     systemd.services =
       let
-        services = concatLists servicesLists;
-        servicesLists = mapAttrsToList certToServices cfg.certs;
+        services = lib.concatLists servicesLists;
+        servicesLists = lib.mapAttrsToList certToServices cfg.certs;
         certToServices = cert: certCfg:
           let
             # StateDirectory must be relative, and will be created under /var/lib by systemd
@@ -303,19 +304,19 @@ in
             spath = "/var/lib/acme/.lego/${cert}";
             fileMode = if certCfg.allowKeysForGroup then "640" else "600";
             globalOpts = [ "-d" certCfg.domain "--email" certCfg.email "--path" "." "--key-type" certCfg.keyType ]
-              ++ optionals (cfg.acceptTerms) [ "--accept-tos" ]
-              ++ optionals (certCfg.dnsProvider != null && !certCfg.dnsPropagationCheck) [ "--dns.disable-cp" ]
-              ++ concatLists (mapAttrsToList (name: root: [ "-d" name ]) certCfg.extraDomains)
+              ++ lib.optionals (cfg.acceptTerms) [ "--accept-tos" ]
+              ++ lib.optionals (certCfg.dnsProvider != null && !certCfg.dnsPropagationCheck) [ "--dns.disable-cp" ]
+              ++ lib.concatLists (lib.mapAttrsToList (name: root: [ "-d" name ]) certCfg.extraDomains)
               ++ (if certCfg.dnsProvider != null then [ "--dns" certCfg.dnsProvider ] else [ "--http" "--http.webroot" certCfg.webroot ])
-              ++ optionals (cfg.server != null || certCfg.server != null) [ "--server" (if certCfg.server == null then cfg.server else certCfg.server) ];
-            certOpts = optionals certCfg.ocspMustStaple [ "--must-staple" ];
-            runOpts = escapeShellArgs (globalOpts ++ [ "run" ] ++ certOpts);
-            renewOpts = escapeShellArgs (globalOpts ++
+              ++ lib.optionals (cfg.server != null || certCfg.server != null) [ "--server" (if certCfg.server == null then cfg.server else certCfg.server) ];
+            certOpts = lib.optionals certCfg.ocspMustStaple [ "--must-staple" ];
+            runOpts = lib.escapeShellArgs (globalOpts ++ [ "run" ] ++ certOpts);
+            renewOpts = lib.escapeShellArgs (globalOpts ++
               [ "renew" "--days" (toString cfg.validMinDays) ] ++
               certOpts ++ certCfg.extraLegoRenewFlags
             );
 
-            acmeDnsDeps = optional
+            acmeDnsDeps = lib.optional
               (certCfg.dnsProvider == "acme-dns")
               "acme-dns-${cert}.service";
 
@@ -341,7 +342,7 @@ in
               # back to its own acme-dns registration logic if ours
               # fails; see acmeDnsService for rationale.
               requires = acmeDnsDeps;
-              wantedBy = mkIf (!config.boot.isContainer) [ "multi-user.target" ];
+              wantedBy = lib.mkIf (!config.boot.isContainer) [ "multi-user.target" ];
 
               # acme-dns requires CNAME support for _acme-challenge
               # records. This setting only affects the behaviour of
@@ -417,7 +418,7 @@ in
                   response=$(curl --fail --silent --show-error \
                     --request POST "$ACME_DNS_API_BASE/register" \
                     --max-time 30 --retry 5 --retry-connrefused \
-                    | jq ${escapeShellArg "{${builtins.toJSON cert}: .}"})
+                    | jq ${lib.escapeShellArg "{${builtins.toJSON cert}: .}"})
                   # Write the response. We do this separately to the
                   # request to ensure that $ACME_DNS_STORAGE_PATH
                   # doesn't get written to if curl or jq fail.
@@ -497,18 +498,18 @@ in
           (
             [{ name = "acme-${cert}"; value = acmeService; }]
             ++
-            optional
+            lib.optional
               (certCfg.dnsProvider == "acme-dns") { name = "acme-dns-${cert}"; value = acmeDnsService; }
-            ++ optional cfg.preliminarySelfsigned { name = "acme-selfsigned-${cert}"; value = selfsignedService; }
+            ++ lib.optional cfg.preliminarySelfsigned { name = "acme-selfsigned-${cert}"; value = selfsignedService; }
           );
-        servicesAttr = listToAttrs services;
+        servicesAttr = lib.listToAttrs services;
       in
       servicesAttr;
 
     systemd.tmpfiles.rules =
       map
         (certCfg: "d ${certCfg.webroot}/.well-known/acme-challenge - ${certCfg.user} ${certCfg.group}")
-        (filter (certCfg: certCfg.webroot != null) (attrValues cfg.certs));
+        (lib.filter (certCfg: certCfg.webroot != null) (lib.attrValues cfg.certs));
 
     systemd.timers =
       let
@@ -518,11 +519,11 @@ in
         # We divide by the number of certificates so that if you
         # have many certificates, the renewals are distributed over
         # the course of the day to avoid rate limits.
-        numCerts = length (attrNames cfg.certs);
+        numCerts = lib.length (lib.attrNames cfg.certs);
         _24hSecs = 60 * 60 * 24;
         AccuracySec = "${toString (_24hSecs / numCerts)}s";
       in
-      flip mapAttrs' cfg.certs (cert: certCfg: nameValuePair
+      lib.flip lib.mapAttrs' cfg.certs (cert: certCfg: lib.nameValuePair
         ("acme-${cert}")
         ({
           description = "Renew ACME Certificate for ${cert}";
@@ -538,7 +539,7 @@ in
         })
       );
 
-    systemd.targets.acme-selfsigned-certificates = mkIf cfg.preliminarySelfsigned { };
+    systemd.targets.acme-selfsigned-certificates = lib.mkIf cfg.preliminarySelfsigned { };
     systemd.targets.acme-certificates = { };
   };
 
