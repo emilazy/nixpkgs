@@ -70,7 +70,7 @@ let
       };
 
       extraDomains = lib.mkOption {
-        type = types.attrsOf (types.nullOr types.str);
+        type = types.attrsOf (types.enum [ null ]);
         default = { };
         example = lib.literalExample ''
           {
