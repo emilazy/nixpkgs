@@ -303,18 +303,55 @@ in
             apath = "/var/lib/${lpath}";
             spath = "/var/lib/acme/.lego/${cert}";
             fileMode = if certCfg.allowKeysForGroup then "640" else "600";
-            globalOpts = [ "-d" certCfg.domain "--email" certCfg.email "--path" "." "--key-type" certCfg.keyType ]
-              ++ lib.optionals (cfg.acceptTerms) [ "--accept-tos" ]
-              ++ lib.optionals (certCfg.dnsProvider != null && !certCfg.dnsPropagationCheck) [ "--dns.disable-cp" ]
-              ++ lib.concatLists (lib.mapAttrsToList (name: root: [ "-d" name ]) certCfg.extraDomains)
-              ++ (if certCfg.dnsProvider != null then [ "--dns" certCfg.dnsProvider ] else [ "--http" "--http.webroot" certCfg.webroot ])
-              ++ lib.optionals (certCfg.server != null) [ "--server" certCfg.server ];
-            certOpts = lib.optionals certCfg.ocspMustStaple [ "--must-staple" ];
-            runOpts = lib.escapeShellArgs (globalOpts ++ [ "run" ] ++ certOpts);
-            renewOpts = lib.escapeShellArgs (globalOpts ++
-              [ "renew" "--days" (toString cfg.validMinDays) ] ++
-              certOpts ++ certCfg.extraLegoRenewFlags
-            );
+
+            globalOpts = {
+              inherit (certCfg) email;
+
+              inherit (certCfg) server;
+              accept-tos = cfg.acceptTerms;
+
+              domains = [ certCfg.domain ] ++
+                lib.attrNames (certCfg.extraDomains);
+              key-type = certCfg.keyType;
+              path = ".";
+            } // challengeOpts;
+
+            challengeType =
+              if certCfg.dnsProvider != null
+              then "dns-01"
+              else "http-01";
+
+            challengeOpts = {
+              dns-01 = {
+                dns = certCfg.dnsProvider;
+                "dns.disable-cp" = !certCfg.dnsPropagationCheck;
+              };
+              http-01 = {
+                http = true;
+                "http.webroot" = certCfg.webroot;
+              };
+            }.${challengeType};
+
+            certOpts = {
+              must-staple = certCfg.ocspMustStaple;
+            };
+
+            toArgs = arg:
+              if builtins.isList arg
+              then lib.concatMap toArgs arg
+              else if builtins.isAttrs arg
+              then lib.cli.toGNUCommandLine { } arg
+              else [ (lib.generators.mkValueStringDefault { } arg) ];
+
+            toShellArgs = args: lib.escapeShellArgs (toArgs args);
+
+            runOpts = toShellArgs [ globalOpts "run" certOpts ];
+            renewOpts = toShellArgs [
+              globalOpts
+              "renew"
+              ({ days = cfg.validMinDays; } // certOpts)
+              certCfg.extraLegoRenewFlags
+            ];
 
             acmeDnsDeps = lib.optional
               (certCfg.dnsProvider == "acme-dns")
@@ -329,7 +366,10 @@ in
               StateDirectoryMode = if certCfg.allowKeysForGroup then "750" else "700";
               WorkingDirectory = spath;
               # Only try loading the credentialsFile if the dns challenge is enabled
-              EnvironmentFile = if certCfg.dnsProvider != null then certCfg.credentialsFile else null;
+              EnvironmentFile =
+                if challengeType == "dns-01"
+                then certCfg.credentialsFile
+                else null;
             };
 
             acmeService = {
