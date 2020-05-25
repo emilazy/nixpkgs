@@ -523,21 +523,18 @@ in
         _24hSecs = 60 * 60 * 24;
         AccuracySec = "${toString (_24hSecs / numCerts)}s";
       in
-      lib.flip lib.mapAttrs' cfg.certs (cert: certCfg: lib.nameValuePair
-        ("acme-${cert}")
-        ({
-          description = "Renew ACME Certificate for ${cert}";
-          wantedBy = [ "timers.target" ];
-          timerConfig = {
-            OnCalendar = cfg.renewInterval;
-            Unit = "acme-${cert}.service";
-            Persistent = "yes";
-            inherit AccuracySec;
-            # Skew randomly within the day, per https://letsencrypt.org/docs/integration-guide/.
-            RandomizedDelaySec = "24h";
-          };
-        })
-      );
+      lib.flip lib.mapAttrs' cfg.certs (cert: _: lib.nameValuePair "acme-${cert}" {
+        description = "Renew ACME Certificate for ${cert}";
+        wantedBy = [ "timers.target" ];
+        timerConfig = {
+          OnCalendar = cfg.renewInterval;
+          Unit = "acme-${cert}.service";
+          Persistent = "yes";
+          inherit AccuracySec;
+          # Skew randomly within the day, per https://letsencrypt.org/docs/integration-guide/.
+          RandomizedDelaySec = "24h";
+        };
+      });
 
     systemd.targets.acme-selfsigned-certificates = lib.mkIf cfg.preliminarySelfsigned { };
     systemd.targets.acme-certificates = { };
