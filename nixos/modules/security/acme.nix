@@ -268,14 +268,14 @@ in
       in
       [
         {
-          assertion = all (certOpts: certOpts.dnsProvider == null || certOpts.webroot == null) certs;
+          assertion = all (certCfg: certCfg.dnsProvider == null || certCfg.webroot == null) certs;
           message = ''
             Options `security.acme.certs.<name>.dnsProvider` and
             `security.acme.certs.<name>.webroot` are mutually exclusive.
           '';
         }
         {
-          assertion = cfg.email != null || all (certOpts: certOpts.email != null) certs;
+          assertion = cfg.email != null || all (certCfg: certCfg.email != null) certs;
           message = ''
             You must define `security.acme.certs.<name>.email` or
             `security.acme.email` to register with the CA.
@@ -295,40 +295,40 @@ in
       let
         services = concatLists servicesLists;
         servicesLists = mapAttrsToList certToServices cfg.certs;
-        certToServices = cert: data:
+        certToServices = cert: certCfg:
           let
             # StateDirectory must be relative, and will be created under /var/lib by systemd
             lpath = "acme/${cert}";
             apath = "/var/lib/${lpath}";
             spath = "/var/lib/acme/.lego/${cert}";
-            fileMode = if data.allowKeysForGroup then "640" else "600";
-            globalOpts = [ "-d" data.domain "--email" data.email "--path" "." "--key-type" data.keyType ]
+            fileMode = if certCfg.allowKeysForGroup then "640" else "600";
+            globalOpts = [ "-d" certCfg.domain "--email" certCfg.email "--path" "." "--key-type" certCfg.keyType ]
               ++ optionals (cfg.acceptTerms) [ "--accept-tos" ]
-              ++ optionals (data.dnsProvider != null && !data.dnsPropagationCheck) [ "--dns.disable-cp" ]
-              ++ concatLists (mapAttrsToList (name: root: [ "-d" name ]) data.extraDomains)
-              ++ (if data.dnsProvider != null then [ "--dns" data.dnsProvider ] else [ "--http" "--http.webroot" data.webroot ])
-              ++ optionals (cfg.server != null || data.server != null) [ "--server" (if data.server == null then cfg.server else data.server) ];
-            certOpts = optionals data.ocspMustStaple [ "--must-staple" ];
+              ++ optionals (certCfg.dnsProvider != null && !certCfg.dnsPropagationCheck) [ "--dns.disable-cp" ]
+              ++ concatLists (mapAttrsToList (name: root: [ "-d" name ]) certCfg.extraDomains)
+              ++ (if certCfg.dnsProvider != null then [ "--dns" certCfg.dnsProvider ] else [ "--http" "--http.webroot" certCfg.webroot ])
+              ++ optionals (cfg.server != null || certCfg.server != null) [ "--server" (if certCfg.server == null then cfg.server else certCfg.server) ];
+            certOpts = optionals certCfg.ocspMustStaple [ "--must-staple" ];
             runOpts = escapeShellArgs (globalOpts ++ [ "run" ] ++ certOpts);
             renewOpts = escapeShellArgs (globalOpts ++
               [ "renew" "--days" (toString cfg.validMinDays) ] ++
-              certOpts ++ data.extraLegoRenewFlags
+              certOpts ++ certCfg.extraLegoRenewFlags
             );
 
             acmeDnsDeps = optional
-              (data.dnsProvider == "acme-dns")
+              (certCfg.dnsProvider == "acme-dns")
               "acme-dns-${cert}.service";
 
             commonServiceConfig = {
               Type = "oneshot";
-              User = data.user;
-              Group = data.group;
+              User = certCfg.user;
+              Group = certCfg.group;
               PrivateTmp = true;
               StateDirectory = "acme/.lego/${cert} acme/.lego/accounts ${lpath}";
-              StateDirectoryMode = if data.allowKeysForGroup then "750" else "700";
+              StateDirectoryMode = if certCfg.allowKeysForGroup then "750" else "700";
               WorkingDirectory = spath;
               # Only try loading the credentialsFile if the dns challenge is enabled
-              EnvironmentFile = if data.dnsProvider != null then data.credentialsFile else null;
+              EnvironmentFile = if certCfg.dnsProvider != null then certCfg.credentialsFile else null;
             };
 
             acmeService = {
@@ -360,7 +360,7 @@ in
                 '';
                 ExecStartPost =
                   let
-                    keyName = builtins.replaceStrings [ "*" ] [ "_" ] data.domain;
+                    keyName = builtins.replaceStrings [ "*" ] [ "_" ] certCfg.domain;
                     script = pkgs.writeScript "acme-post-start" ''
                       #!${pkgs.runtimeShell} -e
                       cd ${apath}
@@ -378,11 +378,11 @@ in
                       fi
 
                       chmod ${fileMode} *.pem
-                      chown '${data.user}:${data.group}' *.pem
+                      chown '${certCfg.user}:${certCfg.group}' *.pem
 
                       if [ "$KEY_CHANGED" = "yes" ]; then
                         : # noop in case postRun is empty
-                        ${data.postRun}
+                        ${certCfg.postRun}
                       fi
                     '';
                   in
@@ -478,15 +478,15 @@ in
                   cat $workdir/{server.key,server.crt,ca.crt} > "${apath}/full.pem"
 
                   # Give key acme permissions
-                  chown '${data.user}:${data.group}' "${apath}/"{key,fullchain,full}.pem
+                  chown '${certCfg.user}:${certCfg.group}' "${apath}/"{key,fullchain,full}.pem
                   chmod ${fileMode} "${apath}/"{key,fullchain,full}.pem
                 '';
               serviceConfig = {
                 Type = "oneshot";
                 PrivateTmp = true;
                 StateDirectory = lpath;
-                User = data.user;
-                Group = data.group;
+                User = certCfg.user;
+                Group = certCfg.group;
               };
               unitConfig = {
                 # Do not create self-signed key when key already exists
@@ -498,7 +498,7 @@ in
             [{ name = "acme-${cert}"; value = acmeService; }]
             ++
             optional
-              (data.dnsProvider == "acme-dns") { name = "acme-dns-${cert}"; value = acmeDnsService; }
+              (certCfg.dnsProvider == "acme-dns") { name = "acme-dns-${cert}"; value = acmeDnsService; }
             ++ optional cfg.preliminarySelfsigned { name = "acme-selfsigned-${cert}"; value = selfsignedService; }
           );
         servicesAttr = listToAttrs services;
@@ -506,7 +506,9 @@ in
       servicesAttr;
 
     systemd.tmpfiles.rules =
-      map (data: "d ${data.webroot}/.well-known/acme-challenge - ${data.user} ${data.group}") (filter (data: data.webroot != null) (attrValues cfg.certs));
+      map
+        (certCfg: "d ${certCfg.webroot}/.well-known/acme-challenge - ${certCfg.user} ${certCfg.group}")
+        (filter (certCfg: certCfg.webroot != null) (attrValues cfg.certs));
 
     systemd.timers =
       let
@@ -520,7 +522,7 @@ in
         _24hSecs = 60 * 60 * 24;
         AccuracySec = "${toString (_24hSecs / numCerts)}s";
       in
-      flip mapAttrs' cfg.certs (cert: data: nameValuePair
+      flip mapAttrs' cfg.certs (cert: certCfg: nameValuePair
         ("acme-${cert}")
         ({
           description = "Renew ACME Certificate for ${cert}";
