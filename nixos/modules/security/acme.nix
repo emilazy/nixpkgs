@@ -3,7 +3,7 @@ with lib;
 let
   cfg = config.security.acme;
 
-  certOpts = { name, ... }: {
+  certSubmodule = { name, ... }: {
     options = {
       webroot = mkOption {
         type = types.nullOr types.str;
@@ -235,7 +235,7 @@ in
 
       certs = mkOption {
         default = { };
-        type = with types; attrsOf (submodule certOpts);
+        type = with types; attrsOf (submodule certSubmodule);
         description = ''
           Attribute set of certificates to get signed and renewed. Creates
           <literal>acme-''${cert}.{service,timer}</literal> systemd units for
