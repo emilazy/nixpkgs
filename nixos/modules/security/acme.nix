@@ -6,6 +6,9 @@ let
 
   certSubmodule = { name, config, ... }: {
     options = {
+      # TODO: Potentially split these into separate accounts options;
+      # see the comment by `acceptTerms` below.
+
       server = lib.mkOption {
         type = types.nullOr types.str;
         default = cfg.server;
@@ -28,6 +31,12 @@ let
         description = "Domain to fetch certificate for (defaults to the entry name)";
       };
 
+      # TODO: Use acme user/group, remove options.
+      #
+      # It might be worth keeping around an option to specify the group
+      # so that different certificates can be kept isolated from
+      # each other.
+
       user = lib.mkOption {
         type = types.str;
         default = "root";
@@ -40,6 +49,7 @@ let
         description = "Group running the ACME client.";
       };
 
+      # TODO: Make always on, remove option.
       allowKeysForGroup = lib.mkOption {
         type = types.bool;
         default = false;
@@ -62,6 +72,9 @@ let
         '';
       };
 
+      # TODO: Deprecate? This has to be in /var/lib thanks to systemd,
+      # and in practice the /var/lib/acme/<cert> path is part of the
+      # module's public API anyway.
       directory = lib.mkOption {
         type = types.str;
         readOnly = true;
@@ -69,6 +82,9 @@ let
         description = "Directory where certificate and other state is stored.";
       };
 
+      # TODO: Allow or mandate using a list here, since distinct
+      # webroots don't work any more anyway? Perhaps this could be
+      # merged with `domain` into a single `domains` option.
       extraDomains = lib.mkOption {
         type = types.attrsOf (types.enum [ null ]);
         default = { };
@@ -204,7 +220,7 @@ in
   ];
   options = {
     security.acme = {
-
+      # TODO: This should be cert-specific.
       validMinDays = lib.mkOption {
         type = types.int;
         default = 30;
@@ -250,6 +266,28 @@ in
         '';
       };
 
+      # TODO: Since `server` can be overriden per certificate, maybe
+      # this should also be per-certificate?
+      #
+      # An overall nicer approach to keep things factored might be
+      # something like:
+      #
+      # security.acme = {
+      #   accounts = {
+      #     letsencrypt-1 = { email = "..."; acceptTerms = true; };
+      #     letsencrypt-2 = { email = "..."; acceptTerms = true; };
+      #     buypass-go = { server = "..."; email = "..."; acceptTerms = true; };
+      #   };
+      #   certs = {
+      #     "example.com" = { account = "letsencrypt-1"; };
+      #     "other.example.com" = { account = "letsencrypt-2"; };
+      #     # ...
+      #   };
+      # };
+      #
+      # Backwards compatibility could be maintained by automatically
+      # initializing missing accounts (e.g. named "${server}-${email}"
+      # or a sanitized variant).
       acceptTerms = lib.mkOption {
         type = types.bool;
         default = false;
