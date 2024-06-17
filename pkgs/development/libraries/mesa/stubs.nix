@@ -10,11 +10,11 @@ stdenv.mkDerivation (finalAttrs: {
   version = if stdenv.hostPlatform.isDarwin then "4.1" else libglvnd.version;
   outputs = [ "out" "dev" ];
 
-  # On macOS, libglvnd is not supported, and mesa no longer builds (but it only
-  # provided a software renderer anyway). Provide the OpenGL framework as well
-  # as a pkg-config file for OpenGL.framework.
   propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isDarwin [ OpenGL ];
 
+  # On macOS, libglvnd is not supported, and mesa should only be used if
+  # necessary. Provide the OpenGL framework as well as a pkg-config file
+  # for OpenGL.framework.
   # GLX is not supported nor is OpenGL ES.
   buildCommand = if stdenv.hostPlatform.isDarwin then ''
     mkdir -p $dev/lib/pkgconfig $dev/nix-support
