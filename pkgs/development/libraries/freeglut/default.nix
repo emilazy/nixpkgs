@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, libICE, libXext, libXi, libXrandr, libXxf86vm, mesa, libGLU, cmake
+{ lib, stdenv, fetchurl, libICE, libXext, libXi, libXrandr, libXxf86vm, mesa, libGLU, OpenGL, cmake
 , testers
 }:
 
@@ -14,7 +14,8 @@ stdenv.mkDerivation (finalAttrs: {
   outputs = [ "out" "dev" ];
 
   nativeBuildInputs = [ cmake ];
-  buildInputs = [ libICE libXext libXi libXrandr libXxf86vm mesa libGLU ];
+  buildInputs = [ libICE libXext libXi libXrandr libXxf86vm mesa libGLU ]
+    ++ lib.optional stdenv.isDarwin OpenGL;
 
   cmakeFlags = lib.optionals stdenv.isDarwin [
                  "-DOPENGL_INCLUDE_DIR=${mesa.dev}/include"

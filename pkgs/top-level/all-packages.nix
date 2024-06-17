@@ -20731,7 +20731,9 @@ with pkgs;
 
   freealut = callPackage ../development/libraries/freealut { };
 
-  freeglut = callPackage ../development/libraries/freeglut { };
+  freeglut = callPackage ../development/libraries/freeglut {
+    inherit (darwin.apple_sdk.frameworks) OpenGL;
+  };
 
   freenect = callPackage ../development/libraries/freenect {
     inherit (darwin.apple_sdk.frameworks) Cocoa GLUT;
