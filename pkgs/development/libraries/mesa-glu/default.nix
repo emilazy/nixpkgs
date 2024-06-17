@@ -1,6 +1,6 @@
 { lib, stdenv, fetchurl
 , meson, ninja
-, pkg-config, libGL, ApplicationServices
+, pkg-config, mesa, libGL, ApplicationServices
 , testers
 , gitUpdater
 }:
@@ -17,8 +17,10 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   nativeBuildInputs = [ meson ninja pkg-config ];
-  propagatedBuildInputs = [ libGL ]
-    ++ lib.optional stdenv.isDarwin ApplicationServices;
+  propagatedBuildInputs = if stdenv.isDarwin then
+    [ mesa ApplicationServices ]
+  else
+    [ libGL ];
 
   outputs = [ "out" "dev" ];
 
