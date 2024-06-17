@@ -13,11 +13,12 @@ stdenv.mkDerivation (finalAttrs: {
   # On macOS, libglvnd is not supported, and mesa no longer builds (but it only
   # provided a software renderer anyway). Provide the OpenGL framework as well
   # as a pkg-config file for OpenGL.framework.
+  propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isDarwin [ OpenGL ];
+
   # GLX is not supported nor is OpenGL ES.
   buildCommand = if stdenv.hostPlatform.isDarwin then ''
-    mkdir -p $out/nix-support $dev/lib/pkgconfig $dev/nix-support
+    mkdir -p $dev/lib/pkgconfig $dev/nix-support
 
-    echo ${OpenGL} >> $out/nix-support/propagated-build-inputs
     echo "$out" > $dev/nix-support/propagated-build-inputs
 
     mkdir -p $out/lib
