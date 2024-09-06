@@ -105,6 +105,7 @@ with lib;
         jq # for closureInfo
         # For boot.initrd.systemd
         makeInitrdNGTool
+        switch-to-configuration-ng
       ];
 
     boot.swraid.enable = true;
