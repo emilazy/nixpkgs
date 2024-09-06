@@ -64,7 +64,7 @@ _overrideFirst outputInfo "info" "$outputBin"
 
 # Add standard flags to put files into the desired outputs.
 _multioutConfig() {
-    if [ "$(getAllOutputNames)" = "out" ] || [ -z "${setOutputFlags-1}" ]; then return; fi;
+    if [ -z "${setOutputFlags-1}" ]; then return; fi;
 
     # try to detect share/doc/${shareDocName}
     # Note: sadly, $configureScript detection comes later in configurePhase,
