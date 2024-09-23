@@ -1,6 +1,6 @@
 {
   stdenv,
-  bazel_5,
+  bazel_6,
   buildBazelPackage,
   lib,
   fetchFromGitHub,
@@ -12,7 +12,6 @@
   # Python deps
   buildPythonPackage,
   pythonAtLeast,
-  pythonOlder,
   python,
   # Python libraries
   numpy,
@@ -115,7 +114,7 @@ let
   # use compatible cuDNN (https://www.tensorflow.org/install/source#gpu)
   # cudaPackages.cudnn led to this:
   # https://github.com/tensorflow/tensorflow/issues/60398
-  cudnnAttribute = "cudnn_8_6";
+  cudnnAttribute = "cudnn_8_9";
   cudnnMerged = symlinkJoin {
     name = "cudnn-merged";
     paths = [
@@ -133,8 +132,6 @@ let
       path = protobuf-core.src;
     }
   ];
-
-  withTensorboard = (pythonOlder "3.6") || tensorboardSupport;
 
   cudaComponents = with cudaPackages; [
     (cuda_nvcc.__spliced.buildHost or cuda_nvcc)
@@ -181,7 +178,7 @@ let
 
   tfFeature = x: if x then "1" else "0";
 
-  version = "2.13.0";
+  version = "2.17.0";
   format = "setuptools";
   variant = lib.optionalString cudaSupport "-gpu";
   pname = "tensorflow${variant}";
@@ -289,13 +286,13 @@ let
 
   _bazel-build = buildBazelPackage.override { inherit stdenv; } {
     name = "${pname}-${version}";
-    bazel = bazel_5;
+    bazel = bazel_6;
 
     src = fetchFromGitHub {
       owner = "tensorflow";
       repo = "tensorflow";
       rev = "refs/tags/v${version}";
-      hash = "sha256-Rq5pAVmxlWBVnph20fkAwbfy+iuBNlfFy14poDPd5h0=";
+      hash = "sha256-dJGmoYdOTumFdS8AWWGYp5HRxk/WMKQNRi2ubyD/TAU=";
     };
 
     # On update, it can be useful to steal the changes from gentoo
@@ -361,11 +358,10 @@ let
         "astor_archive"
         "astunparse_archive"
         "boringssl"
-        "com_google_absl"
         # Not packaged in nixpkgs
-        # "com_github_googleapis_googleapis"
         # "com_github_googlecloudplatform_google_cloud_cpp"
         "com_github_grpc_grpc"
+        "com_google_absl"
         "com_google_protobuf"
         # Fails with the error: external/org_tensorflow/tensorflow/core/profiler/utils/tf_op_utils.cc:46:49: error: no matching function for call to 're2::RE2::FullMatch(absl::lts_2020_02_25::string_view&, re2::RE2&)'
         # "com_googlesource_code_re2"
@@ -373,7 +369,7 @@ let
         "cython"
         "dill_archive"
         "double_conversion"
-        "flatbuffers"
+        #"flatbuffers"
         "functools32_archive"
         "gast_archive"
         "gif"
@@ -382,7 +378,6 @@ let
         "jsoncpp_git"
         "libjpeg_turbo"
         "nasm"
-        "opt_einsum_archive"
         "org_sqlite"
         "pasta"
         "png"
@@ -408,6 +403,8 @@ let
     PROTOBUF_INCLUDE_PATH = "${protobuf-core}/include";
 
     PYTHON_BIN_PATH = pythonEnv.interpreter;
+
+    TF_PYTHON_VERSION = pythonEnv.pythonVersion;
 
     TF_NEED_GCP = true;
     TF_NEED_HDFS = true;
@@ -437,7 +434,7 @@ let
         hash = "sha256-/7buV6DinKnrgfqbe7KKSh9rCebeQdXv2Uj+Xg/083w=";
       })
       ./com_google_absl_add_log.patch
-      ./absl_py_argparse_flags.patch
+      #./absl_py_argparse_flags.patch
       ./protobuf_python.patch
       ./pybind11_protobuf_python_runtime_dep.patch
       ./pybind11_protobuf_newer_version.patch
@@ -452,7 +449,7 @@ let
       + lib.optionalString (stdenv.hostPlatform.system == "x86_64-darwin") ''
         cat ${./com_google_absl_fix_macos.patch} >> third_party/absl/com_google_absl_fix_mac_and_nvcc_build.patch
       ''
-      + lib.optionalString (!withTensorboard) ''
+      + lib.optionalString (!tensorboardSupport) ''
         # Tensorboard pulls in a bunch of dependencies, some of which may
         # include security vulnerabilities. So we make it optional.
         # https://github.com/tensorflow/tensorflow/issues/20280#issuecomment-400230560
@@ -495,9 +492,13 @@ let
 
     hardeningDisable = [ "format" ];
 
+    # set TF_PYTHON_VERSION
+
     bazelBuildFlags =
       [
+        # tensorflow-2.17.0-deps.tar.gz> Please specify optimization flags to use during compilation when bazel option "--config=opt" is specified [Default is -Wno-sign-compare]:
         "--config=opt" # optimize using the flags set in the configure phase
+        "--repo-env=WHEEL_NAME=tensorflow_cpu"
       ]
       ++ lib.optionals stdenv.cc.isClang [
         "--cxxopt=-x"
@@ -511,7 +512,7 @@ let
       ++ lib.optionals (mklSupport) [ "--config=mkl" ];
 
     bazelTargets = [
-      "//tensorflow/tools/pip_package:build_pip_package //tensorflow/tools/lib_package:libtensorflow"
+      "//tensorflow/tools/pip_package:wheel //tensorflow/tools/lib_package:libtensorflow"
     ];
 
     removeRulesCC = false;
@@ -523,16 +524,16 @@ let
         {
           x86_64-linux =
             if cudaSupport then
-              "sha256-5VFMNHeLrUxW5RTr6EhT3pay9nWJ5JkZTGirDds5QkU="
+              ""
             else
-              "sha256-KzgWV69Btr84FdwQ5JI2nQEsqiPg1/+TWdbw5bmxXOE=";
+              "";
           aarch64-linux =
             if cudaSupport then
-              "sha256-ty5+51BwHWE1xR4/0WcWTp608NzSAS/iiyN+9zx7/wI="
+              ""
             else
-              "sha256-9btXrNHqd720oXTPDhSmFidv5iaZRLjCVX8opmrMjXk=";
-          x86_64-darwin = "sha256-gqb03kB0z2pZQ6m1fyRp1/Nbt8AVVHWpOJSeZNCLc4w=";
-          aarch64-darwin = "sha256-WdgAaFZU+ePwWkVBhLzjlNT7ELfGHOTaMdafcAMD5yo=";
+              "";
+          x86_64-darwin = "";
+          aarch64-darwin = "";
         }
         .${stdenv.hostPlatform.system} or (throw "unsupported system ${stdenv.hostPlatform.system}");
     };
@@ -611,7 +612,6 @@ let
 in
 buildPythonPackage {
   inherit version pname;
-  disabled = pythonAtLeast "3.12";
 
   src = bazel-build.python;
 
@@ -661,7 +661,7 @@ buildPythonPackage {
     termcolor
     typing-extensions
     wrapt
-  ] ++ lib.optionals withTensorboard [ tensorboard ];
+  ] ++ lib.optionals tensorboardSupport [ tensorboard ];
 
   nativeBuildInputs = lib.optionals cudaSupport [ addDriverRunpath ];
 

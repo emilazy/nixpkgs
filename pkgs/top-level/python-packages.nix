@@ -15280,7 +15280,7 @@ self: super: with self; {
         abseil-cpp = pkgs.abseil-cpp_202301;
       };
       # https://www.tensorflow.org/install/source#gpu
-      cudaPackagesTF = pkgs.cudaPackages_11;
+      cudaPackagesTF = pkgs.cudaPackages_12_3;
       grpcTF = (pkgs.grpc.overrideAttrs (
         oldAttrs: rec {
           # nvcc fails on recent grpc versions, so we use the latest patch level
@@ -15333,12 +15333,9 @@ self: super: with self; {
     tensorboard = compat.tensorboardTF;
     abseil-cpp = pkgs.abseil-cpp_202301;
 
-    # Tensorflow 2.13 doesn't support gcc13:
-    # https://github.com/tensorflow/tensorflow/issues/61289
-    #
     # We use the nixpkgs' default libstdc++ to stay compatible with other
     # python modules
-    stdenv = pkgs.stdenvAdapters.useLibsFrom stdenv pkgs.gcc12Stdenv;
+    stdenv = pkgs.stdenvAdapters.useLibsFrom stdenv pkgs.llvmPackages_17.stdenv;
   };
 
   tensorflow-datasets = callPackage ../development/python-modules/tensorflow-datasets { };
