@@ -142,6 +142,8 @@ qtModule {
 
   postPatch =
     ''
+      env
+      exit 99
       # Patch Chromium build tools
       (
         cd src/3rdparty/chromium;
@@ -210,9 +212,6 @@ qtModule {
     ]
     ++ lib.optionals enableProprietaryCodecs [
       "-DQT_FEATURE_webengine_proprietary_codecs=ON"
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      "-DCMAKE_OSX_DEPLOYMENT_TARGET=11.0" # Per Qt 6’s deployment target (why doesn’t the hook work?)
     ];
 
   propagatedBuildInputs =
