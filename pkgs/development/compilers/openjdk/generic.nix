@@ -48,6 +48,8 @@
   liberation_ttf,
   cacert,
 
+  nixpkgs-openjdk-updater,
+
   # TODO(@sternenseemann): gtk3 fails to evaluate in pkgsCross.ghcjs.buildPackages
   # which should be fixable, this is a no-rebuild workaround for GHC.
   headless ? lib.versionAtLeast featureVersion "21" && stdenv.targetPlatform.isGhcjs,
@@ -618,6 +620,12 @@ stdenv.mkDerivation (finalAttrs: {
 
   passthru =
     {
+      updateScript = nixpkgs-openjdk-updater.openjdkUpdater {
+        inherit sourceFile;
+        inherit (sourceInfo) owner repo;
+        featureVersionPrefix = tagPrefix + featureVersion;
+      };
+
       home = "${finalAttrs.finalPackage}/lib/openjdk";
 
       inherit jdk-bootstrap;
@@ -625,7 +633,17 @@ stdenv.mkDerivation (finalAttrs: {
     // (if atLeast11 then { inherit gtk3; } else { inherit gtk2; })
     // lib.optionalAttrs (!atLeast23) {
       inherit architecture;
-    };
+    }
+    //
+      # We use `lib.mapAttrs` to ensure that `openjdx.src` doesn’t have a
+      # known position so that `nix-update` looks at our `pos`.
+      lib.mapAttrs (_: value: value) { inherit (finalAttrs) src; };
+
+  pos = {
+    file = toString sourceFile;
+    line = 1;
+    column = 1;
+  };
 
   meta = {
     description = "Open-source Java Development Kit";
