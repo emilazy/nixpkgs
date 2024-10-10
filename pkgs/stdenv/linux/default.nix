@@ -387,6 +387,8 @@ in
               "--with-build-sysroot=${lib.getDev self.stdenv.cc.libc}"
             ];
 
+            postConfigure = a.postConfigure or "" + "\necho hello emily; exit 99";
+
             # This is a separate phase because gcc assembles its phase scripts
             # in bash instead of nix (we should fix that).
             preFixupPhases = (a.preFixupPhases or []) ++ [ "preFixupXgccPhase" ];
