@@ -18,6 +18,7 @@ originalAttrs: (stdenv.mkDerivation (finalAttrs: originalAttrs // {
     export NIX_FIXINC_DUMMY="$NIX_BUILD_TOP/dummy"
     mkdir "$NIX_FIXINC_DUMMY"
 
+    echo "====> NIX_DONT_SET_RPATH = ''${NIX_DONT_SET_RPATH-nothing}"
     if test "$staticCompiler" = "1"; then
         EXTRA_LDFLAGS="-static"
     elif test "''${NIX_DONT_SET_RPATH-}" != "1"; then
@@ -60,6 +61,8 @@ originalAttrs: (stdenv.mkDerivation (finalAttrs: originalAttrs // {
             fi
             extraLDFlags=("-L$libc_libdir")
             nixDontSetRpathVar=NIX_DONT_SET_RPATH''${post}
+            echo "=====> nixDontSetRpathVar = $nixDontSetRpathVar"
+            echo "=====> value = ''${!nixDontSetRpathVar-nothing}"
             if test "''${!nixDontSetRpathVar-}" != "1"; then
                 extraLDFlags+=("-rpath" "$libc_libdir")
             fi
