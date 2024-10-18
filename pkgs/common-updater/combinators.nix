@@ -120,21 +120,28 @@ rec {
     let
       scripts = scriptsNormalized;
       hasCommitSupport = lib.findSingle ({ supportedFeatures, ... }: supportedFeatures == [ "commit" ]) null null scripts != null;
+      hasSilentSupport = lib.findFirst ({ supportedFeatures, ... }: supportedFeatures == [ "silent" ]) null scripts != null;
       validateFeatures =
         if hasCommitSupport then
           ({ supportedFeatures, ... }: supportedFeatures == [ "commit" ] || supportedFeatures == [ "silent" ])
+        else if hasSilentSupport then
+          ({ supportedFeatures, ... }: supportedFeatures == [ "silent" ])
         else
           ({ supportedFeatures, ... }: supportedFeatures == [ ]);
     in
 
-    assert lib.assertMsg (lib.all validateFeatures scripts) "Combining update scripts with features enabled (other than a single script with “commit” and all other with “silent”) is currently unsupported.";
+    assert lib.assertMsg (lib.all validateFeatures scripts) "Combining update scripts with features enabled (other than “silent” scripts and an optional single script with “commit”) is currently unsupported.";
     assert lib.assertMsg (builtins.length (lib.unique (builtins.map ({ attrPath ? null, ... }: attrPath) scripts)) == 1) "Combining update scripts with different attr paths is currently unsupported.";
 
     {
       command = commandsToShellInvocation (builtins.map ({ command, ... }: command) scripts);
-      supportedFeatures = lib.optionals hasCommitSupport [
-        "commit"
-      ];
+      supportedFeatures =
+        if hasCommitSupport then
+          [ "commit" ]
+        else if hasSilentSupport then
+          [ "silent" ]
+        else
+          [ ];
     };
 
   /*
