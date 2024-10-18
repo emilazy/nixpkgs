@@ -28,6 +28,9 @@
 
   writeText,
 
+  _experimental-update-script-combinators,
+  nixpkgs-openjdk-updater,
+
   withMedia ? true,
   withWebKit ? false,
 
@@ -56,7 +59,7 @@ in
 assert lib.assertMsg (lib.pathExists sourceFile)
   "OpenJFX ${featureVersion} is not a supported version";
 
-stdenv.mkDerivation {
+stdenv.mkDerivation (finalAttrs: {
   pname = "openjfx-modular-sdk";
   version = lib.removePrefix "refs/tags/" sourceInfo.rev;
 
@@ -168,6 +171,31 @@ stdenv.mkDerivation {
     gradle_openjfx.jdk
   ];
 
+  passthru =
+    {
+      updateScript = _experimental-update-script-combinators.sequence [
+        (nixpkgs-openjdk-updater.openjdkUpdater {
+          inherit sourceFile;
+          inherit (sourceInfo) owner repo;
+          featureVersionPrefix = featureVersion;
+        })
+
+        finalAttrs.mitmCache.updateScript
+      ];
+
+      cargoDeps.lockFile = ./${featureVersion}/deps.json;
+    }
+    //
+    # We use `lib.mapAttrs` to ensure that `openjfx.src` doesn’t have a
+    # known position so that `nix-update` looks at our `pos`.
+    lib.mapAttrs (_: value: value) { inherit (finalAttrs) src; };
+
+  pos = {
+    file = toString sourceFile;
+    line = 1;
+    column = 1;
+  };
+
   meta = {
     description = "Next-generation Java client toolkit";
     homepage = "https://openjdk.org/projects/openjfx/";
@@ -175,4 +203,4 @@ stdenv.mkDerivation {
     maintainers = with lib.maintainers; [ abbradar ];
     platforms = lib.platforms.unix;
   };
-}
+})
