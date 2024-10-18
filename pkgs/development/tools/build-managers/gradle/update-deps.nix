@@ -41,31 +41,15 @@ let
   }));
   sourceDrvPath = builtins.unsafeDiscardOutputDependency source.drvPath;
   nixShellKeep = lib.concatMapStringsSep " " (x: "--keep ${x}") keep;
-in
-writeTextFile {
-  name = "fetch-deps.sh";
-  executable = true;
-  # see pkgs/common-updater/combinators.nix
-  derivationArgs.passthru =
-    { supportedFeatures = lib.optional silent "silent"; }
-    // lib.optionalAttrs (attrPath != null) { inherit attrPath; };
-  text = ''
+
+  fetchDepsScript = ''
     #!${runtimeShell}
     set -eo pipefail
     export PATH="${lib.makeBinPath ([
       coreutils curl jq mitm-cache openssl
       procps python3.pkgs.ephemeral-port-reserve
     ] ++ lib.optional useBwrap bubblewrap)}:$PATH"
-    outPath="${
-      # if this is an absolute path in nix store, use path relative to the store path
-      if lib.hasPrefix "${builtins.storeDir}/" (toString data)
-      then builtins.concatStringsSep "/" (lib.drop 1 (lib.splitString "/" (lib.removePrefix "${builtins.storeDir}/" (toString data))))
-      # if this is an absolute path anywhere else, just use that path
-      else if lib.hasPrefix "/" (toString data)
-      then toString data
-      # otherwise, use a path relative to the package
-      else "${dirOf pkg.meta.position}/${data}"
-    }"
+    outPath="$1"
 
     pushd "$(mktemp -d)" >/dev/null
     MITM_CACHE_DIR="$PWD"
@@ -119,4 +103,20 @@ writeTextFile {
     done
     exit 1
   '';
+in {
+  command = [
+    (writeTextFile {
+      name = "fetch-deps.sh";
+      executable = true;
+      text = fetchDepsScript;
+    })
+
+    # We need to pass the path to the file being updated as an
+    # argument, because `maintainers/scripts/update.py` does a horrible
+    # hack to rewrite paths in arguments into the Git worktree it
+    # creates, which doesn’t work inside script text.
+    data
+  ];
+  # see pkgs/common-updater/combinators.nix
+  supportedFeatures = lib.optional silent "silent";
 })

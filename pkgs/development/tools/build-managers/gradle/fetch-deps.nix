@@ -25,20 +25,20 @@ in
 , useBwrap ? stdenv.hostPlatform.isLinux
 } @ attrs:
 
-let
-  dataPath =
-    if builtins.isPath data then toString data
-    else if builtins.isString data then "${dirOf pkg.meta.position}/${data}"
-    else null;
+assert builtins.isPath data || builtins.isAttrs data;
 
+let
   dataPos =
     let names = builtins.attrNames data; in
-    if dataPath != null then { file = dataPath; line = 1; column = 1; }
-    else if builtins.length names > 0 then builtins.unsafeGetAttrPos (builtins.head names) data
+    if builtins.isPath data then {
+      file = toString data;
+      line = 1;
+      column = 1;
+    } else if builtins.length names > 0 then builtins.unsafeGetAttrPos (builtins.head names) data
     else builtins.unsafeGetAttrPos "data" attrs;
 
   data' = builtins.removeAttrs
-    (if dataPath != null then dataPath else data)
+    (if builtins.isPath data then builtins.importJSON data else data)
     [ "!comment" "!version" ];
 
   parseArtifactUrl = url: let

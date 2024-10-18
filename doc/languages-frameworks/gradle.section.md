@@ -57,12 +57,11 @@ stdenv.mkDerivation (finalAttrs: {
 })
 ```
 
-To update (or initialize) dependencies, run the update script via
-something like `$(nix-build -A <pname>.mitmCache.updateScript)`
-(`nix-build` builds the `updateScript`, `$(...)` runs the script at the
-path printed by `nix-build`).
+To update (or initialize) dependencies, run the update script using
+[`nix-update`](https://github.com/Mic92/nix-update) with something like
+`nix-update -u --version skip <attr>.mitmCache`.
 
-If your package can't be evaluated using a simple `pkgs.<pname>`
+If your package can't be evaluated using a simple `pkgs.<attr>`
 expression (for example, if your package isn't located in nixpkgs, or if
 you want to override some of its attributes), you will usually have to
 pass `pkg` instead of `pname` to `gradle.fetchDeps`. There are two ways
