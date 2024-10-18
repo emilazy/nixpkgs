@@ -26,10 +26,19 @@ in
 } @ attrs:
 
 let
+  dataPath =
+    if builtins.isPath data then toString data
+    else if builtins.isString data then "${dirOf pkg.meta.position}/${data}"
+    else null;
+
+  dataPos =
+    let names = builtins.attrNames data; in
+    if dataPath != null then { file = dataPath; line = 1; column = 1; }
+    else if builtins.length names > 0 then builtins.unsafeGetAttrPos (builtins.head names) data
+    else builtins.unsafeGetAttrPos "data" attrs;
+
   data' = builtins.removeAttrs
-    (if builtins.isPath data then lib.importJSON data
-    else if builtins.isString data then lib.importJSON "${dirOf pkg.meta.position}/${data}"
-    else data)
+    (if dataPath != null then dataPath else data)
     [ "!comment" "!version" ];
 
   parseArtifactUrl = url: let
@@ -218,4 +227,5 @@ in
         inherit pkg pname attrPath bwrapFlags data silent useBwrap;
       };
     };
+    pos = dataPos;
   }
