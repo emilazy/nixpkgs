@@ -215,17 +215,10 @@ stdenv.mkDerivation (
                 [
                   zlib
                 ]
-                ++ lib.optional stdenv.hostPlatform.isDarwin (
-                  with darwin;
-                  with apple_sdk.frameworks;
-                  [
-                    swiftPackages.swift
-                    Foundation
-                    CryptoKit
-                    GSS
-                    ICU
-                  ]
-                );
+                ++ lib.optional stdenv.hostPlatform.isDarwin [
+                  swiftPackages.swift
+                  darwin.ICU
+                ];
               build = ''
                 dotnet restore -p:PublishAot=true
                 dotnet publish -p:PublishAot=true -o $out/bin

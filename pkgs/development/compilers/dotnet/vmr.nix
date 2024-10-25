@@ -107,29 +107,15 @@ stdenv.mkDerivation rec {
       zlib
       _icu
       openssl
+      krb5
     ]
     ++ lib.optionals isLinux [
-      krb5
       lttng-ust_2_12
     ]
-    ++ lib.optionals isDarwin (
-      with apple_sdk.frameworks;
-      [
-        xcbuild
-        swift
-        (krb5.overrideAttrs (old: {
-          # the propagated build inputs break swift compilation
-          buildInputs = old.buildInputs ++ old.propagatedBuildInputs;
-          propagatedBuildInputs = [ ];
-        }))
-        sigtool
-        Foundation
-        CoreFoundation
-        CryptoKit
-        System
-      ]
-      ++ lib.optional (lib.versionAtLeast version "9") GSS
-    );
+    ++ lib.optionals isDarwin [
+      swift
+      sigtool
+    ];
 
   # This is required to fix the error:
   # > CSSM_ModuleLoad(): One or more parameters passed to a function were not valid.
