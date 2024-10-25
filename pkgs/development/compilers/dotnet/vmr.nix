@@ -306,15 +306,12 @@ stdenv.mkDerivation rec {
           -s \$prev -t elem -n SkipInstallerBuild -v true \
           src/runtime/Directory.Build.props
 
-        # stop passing -sdk without a path
-        # stop using xcrun
         # add -module-cache-path to fix swift errors, see sandboxProfile
         # <unknown>:0: error: unable to open output file '/var/folders/[...]/C/clang/ModuleCache/[...]/SwiftShims-[...].pcm': 'Operation not permitted'
         # <unknown>:0: error: could not build Objective-C module 'SwiftShims'
         substituteInPlace \
           src/runtime/src/native/libs/System.Security.Cryptography.Native.Apple/CMakeLists.txt \
-          --replace-fail ' -sdk ''${CMAKE_OSX_SYSROOT}' "" \
-          --replace-fail 'xcrun swiftc' 'swiftc -module-cache-path "$ENV{HOME}/.cache/module-cache"'
+          --replace-fail 'xcrun swiftc' 'xcrun swiftc -module-cache-path "$ENV{HOME}/.cache/module-cache"'
       ''
       + lib.optionalString (lib.versionAtLeast version "9") ''
         # fix: strip: error: unknown argument '-n'
@@ -376,6 +373,8 @@ stdenv.mkDerivation rec {
 
   dontConfigureNuget = true; # NUGET_PACKAGES breaks the build
   dontUseCmakeConfigure = true;
+  # Breaks `-L/usr/lib/swift`, which resolves under the `SDKROOT` anyway
+  dontFixCmake = true;
 
   # https://github.com/NixOS/nixpkgs/issues/38991
   # bash: warning: setlocale: LC_ALL: cannot change locale (en_US.UTF-8)
