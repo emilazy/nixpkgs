@@ -25,8 +25,6 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libcdio ];
 
-  configureFlags = lib.optionals stdenv.hostPlatform.isDarwin [ "--disable-ld-version-script" ];
-
   meta = {
     description = "CD paranoia on top of libcdio";
     longDescription = ''
