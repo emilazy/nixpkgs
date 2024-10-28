@@ -12,7 +12,7 @@ stdenv.mkDerivation (finalAttrs: {
   version = "10.2+2.0.2";
 
   src = fetchFromGitHub {
-    owner = "rocky";
+    owner = "libcdio";
     repo = "libcdio-paranoia";
     rev = "release-${finalAttrs.version}";
     hash = "sha256-n05PSVgh6z7BFPq4CjJa5DqCO7Huj8Bsg0x3HQPsbeI=";
