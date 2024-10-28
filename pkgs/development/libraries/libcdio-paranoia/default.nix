@@ -5,9 +5,6 @@
   autoreconfHook,
   libcdio,
   pkg-config,
-  libiconv,
-  IOKit,
-  DiskArbitration,
 }:
 
 stdenv.mkDerivation rec {
@@ -26,14 +23,7 @@ stdenv.mkDerivation rec {
     pkg-config
   ];
   buildInputs =
-    [ libcdio ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      libiconv
-      IOKit
-      DiskArbitration
-    ];
-
-  propagatedBuildInputs = lib.optional stdenv.hostPlatform.isDarwin DiskArbitration;
+    [ libcdio ];
 
   configureFlags = lib.optionals stdenv.hostPlatform.isDarwin [ "--disable-ld-version-script" ];
 
