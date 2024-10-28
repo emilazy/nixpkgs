@@ -20566,8 +20566,6 @@ with pkgs;
     inherit (darwin.apple_sdk.frameworks) Carbon IOKit;
   };
 
-  libcdio-paranoia = callPackage ../development/libraries/libcdio-paranoia { };
-
   libcdr = callPackage ../development/libraries/libcdr { lcms = lcms2; };
 
   libchamplain = callPackage ../development/libraries/libchamplain { };
