@@ -39,7 +39,7 @@
 , OpenGL
 , enableGl ? (enableX11 || enableWayland || enableCocoa)
 , enableCdparanoia ? (!stdenv.hostPlatform.isDarwin)
-, cdparanoia
+, libcdio-paranoia
 , glib
 , testers
 # Checks meson.is_cross_build(), so even canExecute isn't enough.
@@ -110,7 +110,7 @@ stdenv.mkDerivation (finalAttrs: {
     wayland
     wayland-protocols
   ] ++ lib.optional enableCocoa Cocoa
-    ++ lib.optional enableCdparanoia cdparanoia;
+    ++ lib.optional enableCdparanoia libcdio-paranoia;
 
   propagatedBuildInputs = [
     gstreamer

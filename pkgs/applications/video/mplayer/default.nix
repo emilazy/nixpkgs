@@ -8,7 +8,7 @@
 , alsaSupport ? stdenv.hostPlatform.isLinux, alsa-lib
 , screenSaverSupport ? true, libXScrnSaver
 , vdpauSupport ? false, libvdpau
-, cddaSupport ? !stdenv.hostPlatform.isDarwin, cdparanoia
+, cddaSupport ? !stdenv.hostPlatform.isDarwin, libcdio-paranoia
 , dvdnavSupport ? !stdenv.hostPlatform.isDarwin, libdvdnav
 , dvdreadSupport ? true, libdvdread
 , bluraySupport ? true, libbluray
@@ -99,7 +99,7 @@ stdenv.mkDerivation rec {
     ++ lib.optional dvdnavSupport libdvdnav
     ++ lib.optional dvdreadSupport libdvdread
     ++ lib.optional bluraySupport libbluray
-    ++ lib.optional cddaSupport cdparanoia
+    ++ lib.optional cddaSupport libcdio-paranoia
     ++ lib.optional jackaudioSupport libjack2
     ++ lib.optionals amrSupport [ amrnb amrwb ]
     ++ lib.optional x264Support x264

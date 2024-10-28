@@ -2,7 +2,7 @@
 , fetchurl, runCommand, unzip, bchunk, p7zip
 , cmake, pkg-config, makeWrapper
 , zlib, bzip2, libpng
-, dialog, python3, cdparanoia, ffmpeg
+, dialog, python3, libcdio-paranoia, ffmpeg
 }:
 
 let

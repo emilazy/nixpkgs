@@ -11,7 +11,7 @@
   # Cantata doesn't build with cdparanoia enabled so we disable that
   # default for now until I (or someone else) figure it out.
 , withCdda ? false
-, cdparanoia
+, libcdio-paranoia
 , withCddb ? false
 , libcddb
 , withLame ? false
@@ -58,7 +58,7 @@ let
 
   options = [
     { names = [ "CDDB" ]; enable = withCddb; pkgs = [ libcddb ]; }
-    { names = [ "CDPARANOIA" ]; enable = withCdda; pkgs = [ cdparanoia ]; }
+    { names = [ "CDPARANOIA" ]; enable = withCdda; pkgs = [ libcdio-paranoia ]; }
     { names = [ "DEVICES_SUPPORT" ]; enable = withDevices; pkgs = [ ]; }
     { names = [ "DYNAMIC" ]; enable = withDynamic; pkgs = [ ]; }
     { names = [ "FFMPEG" "MPG123" "SPEEXDSP" ]; enable = withReplaygain; pkgs = [ ffmpeg speex mpg123 ]; }

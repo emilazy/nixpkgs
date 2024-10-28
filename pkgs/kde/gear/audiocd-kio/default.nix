@@ -1,7 +1,7 @@
 {
   lib,
   mkKdeDerivation,
-  cdparanoia,
+  libcdio-paranoia,
   flac,
   libogg,
   libvorbis,
@@ -21,7 +21,7 @@ mkKdeDerivation {
   ];
 
   extraBuildInputs = [
-    cdparanoia
+    libcdio-paranoia
     flac
     libogg
     libvorbis

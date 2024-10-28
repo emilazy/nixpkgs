@@ -4,7 +4,7 @@
 , gtk2
 , pkg-config
 , curl
-, cdparanoia
+, libcdio-paranoia
 , libid3tag
 , libtool
 }:
@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   buildInputs = [
     gtk2
     curl
-    cdparanoia
+    libcdio-paranoia
     libid3tag
   ];
   enableParallelBuilding = true;

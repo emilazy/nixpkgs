@@ -3,7 +3,7 @@
 , libkcddb, karchive, kcmutils, kfilemetadata, knewstuff, knotifyconfig, solid, kxmlgui
 , flac, lame, libmad, libmpcdec, libvorbis
 , libsamplerate, libsndfile, taglib
-, cdparanoia, cdrdao, cdrtools, dvdplusrwtools, libburn, libdvdcss, libdvdread, vcdimager
+, libcdio-paranoia, cdrdao, cdrtools, dvdplusrwtools, libburn, libdvdcss, libdvdread, vcdimager
 , ffmpeg, libmusicbrainz3, normalize, sox, transcode, kinit
 }:
 
@@ -26,7 +26,7 @@ mkDerivation {
     # sound utilities
     libsamplerate libsndfile taglib
     # cd/dvd
-    cdparanoia libdvdcss libdvdread
+    libcdio-paranoia libdvdcss libdvdread
     # others
     ffmpeg libmusicbrainz3 shared-mime-info
   ];
@@ -38,7 +38,7 @@ mkDerivation {
         vcdimager flac
       ];
       libraryPath = lib.makeLibraryPath [
-        cdparanoia
+        libcdio-paranoia
       ];
     in ''
       wrapProgram "$out/bin/k3b"     \

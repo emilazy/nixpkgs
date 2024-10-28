@@ -6,7 +6,7 @@
   qtbase, phonon,
   taglib,
   # optional backends
-  withCD ? true, cdparanoia,
+  withCD ? true, libcdio-paranoia,
   withFlac ? true, flac,
   withMidi ? true, fluidsynth, timidity,
   withSpeex ? false, speex,
@@ -27,7 +27,7 @@ assert withAac -> withFfmpeg || withUnfreeAac;
 assert withUnfreeAac -> withAac;
 
 let runtimeDeps = []
-    ++ lib.optional withCD cdparanoia
+    ++ lib.optional withCD libcdio-paranoia
     ++ lib.optional withFlac flac
     ++ lib.optional withSpeex speex
     ++ lib.optional withFfmpeg ffmpeg-full

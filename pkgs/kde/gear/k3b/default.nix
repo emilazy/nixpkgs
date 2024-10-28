@@ -13,7 +13,7 @@
   libsamplerate,
   cdrdao,
   cdrtools,
-  cdparanoia,
+  libcdio-paranoia,
   dvdplusrwtools,
   libburn,
   libdvdcss,
@@ -60,7 +60,7 @@ mkKdeDerivation {
     # FIXME: this should really be done with patchelf --add-rpath, but it breaks the binary somehow
     "--prefix LD_LIBRARY_PATH : ${
       lib.makeLibraryPath [
-        cdparanoia
+        libcdio-paranoia
         libdvdcss
       ]
     }"

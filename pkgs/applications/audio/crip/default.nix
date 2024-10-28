@@ -4,7 +4,7 @@
 
 , perlPackages
 
-, cdparanoia
+, libcdio-paranoia
 , coreutils
 , eject
 , flac
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ makeWrapper ];
 
   toolDeps = lib.makeBinPath [
-    cdparanoia
+    libcdio-paranoia
     coreutils
     eject
     flac

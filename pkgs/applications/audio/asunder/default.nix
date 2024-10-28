@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, makeWrapper, gtk2, libcddb, intltool, pkg-config, cdparanoia
+{ lib, stdenv, fetchurl, makeWrapper, gtk2, libcddb, intltool, pkg-config, libcdio-paranoia
 , mp3Support ? false, lame
 , oggSupport ? true, vorbis-tools
 , flacSupport ? true, flac
@@ -27,7 +27,7 @@ stdenv.mkDerivation rec {
     lib.optional opusSupport opusTools ++
     lib.optional wavpackSupport wavpack ++
     lib.optional monkeysAudioSupport monkeysAudio ++
-    [ cdparanoia ];
+    [ libcdio-paranoia ];
 
   postInstall = ''
     wrapProgram "$out/bin/asunder" \
