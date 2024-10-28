@@ -28383,11 +28383,6 @@ with pkgs;
     inherit (darwin) IOKit;
   };
 
-  cdparanoiaIII = callPackage ../applications/audio/cdparanoia {
-    inherit (darwin) IOKit;
-    inherit (darwin.apple_sdk.frameworks) Carbon;
-  };
-
   celeste = callPackage ../applications/networking/sync/celeste { };
 
   cyan = callPackage ../applications/graphics/cyan { };
