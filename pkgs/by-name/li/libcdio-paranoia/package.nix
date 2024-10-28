@@ -25,6 +25,11 @@ stdenv.mkDerivation (finalAttrs: {
 
   buildInputs = [ libcdio ];
 
+  postInstall = ''
+    # Symlink for compatibility with cdparanoia.
+    ln -s $out/bin/{cd-paranoia,cdparanoia}
+  '';
+
   meta = {
     description = "CD paranoia on top of libcdio";
     longDescription = ''
