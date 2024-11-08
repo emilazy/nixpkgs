@@ -10,7 +10,7 @@
 , enableRustcDev ? true
 , version
 , sha256
-, patches ? []
+, patches ? [ ]
 , fd
 , ripgrep
 , wezterm

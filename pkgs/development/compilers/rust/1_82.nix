@@ -133,6 +133,7 @@ import ./default.nix
         url = "https://github.com/rust-lang/rust/commit/c15469a7fec811d1a4f69ff26e18c6f383df41d2.patch";
         hash = "sha256-lFc48AMoGf4LCP65IsXS5rEB9eYacTP8ADftQkj8zkg=";
       })
+      ./test.patch
     ];
   }
 
