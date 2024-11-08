@@ -120,7 +120,11 @@ in stdenv.mkDerivation (finalAttrs: {
 
     # Other targets that don't need any extra dependencies to build.
     ] ++ optionals (!fastCross) [
-      "wasm32-unknown-unknown"
+      # TODO(llvm-19): Figure out why this is using a wrapped Clang of
+      # the wrong target on Darwin but not on Linux, and fix it somehow
+      # (probably by making Darwin act more like Linux here rather than
+      # messing around with LLVM or compiler wrappers).
+      #"wasm32-unknown-unknown"
 
     # (build!=target): When cross-building a compiler we need to add
     # the build platform as well so rustc can compile build.rs
