@@ -1068,7 +1068,6 @@ mapAliases {
   rtx = mise; # Added 2024-01-05
   runCommandNoCC = runCommand;
   runCommandNoCCLocal = runCommandLocal;
-  rustc-wasm32 = rustc; # Added 2023-12-01
   rustic-rs = rustic; # Added 2024-08-02
   rxvt_unicode = throw "'rxvt_unicode' has been renamed to/replaced by 'rxvt-unicode-unwrapped'"; # Converted to throw 2024-10-17
   rxvt_unicode-with-plugins = throw "'rxvt_unicode-with-plugins' has been renamed to/replaced by 'rxvt-unicode'"; # Converted to throw 2024-10-17

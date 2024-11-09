@@ -4,7 +4,7 @@
 , lldap
 , nixosTests
 , rustPlatform
-, rustc
+, rustc-wasm32
 , wasm-bindgen-cli
 , wasm-pack
 , which
@@ -39,7 +39,7 @@ let
     pname = commonDerivationAttrs.pname + "-frontend";
 
     nativeBuildInputs = [
-      wasm-pack wasm-bindgen-cli binaryen which rustc rustc.llvmPackages.lld
+      wasm-pack wasm-bindgen-cli binaryen which rustc-wasm32 rustc-wasm32.llvmPackages.lld
     ];
 
     buildPhase = ''

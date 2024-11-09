@@ -33,18 +33,10 @@
 let
   llvmSharedFor =
     pkgSet:
-    pkgSet.llvmPackages_19.libllvm.override (
+    pkgSet.llvmPackages_19.libllvm.override
       {
         enableSharedLibraries = true;
-      }
-      // lib.optionalAttrs (stdenv.targetPlatform.useLLVM or false) {
-        # Force LLVM to compile using clang + LLVM libs when targeting pkgsLLVM
-        stdenv = pkgSet.stdenv.override {
-          allowedRequisites = null;
-          cc = pkgSet.pkgsBuildHost.llvmPackages_19.clangUseLLVM;
-        };
-      }
-    );
+      };
 in
 import ./default.nix
   {
@@ -59,50 +51,7 @@ import ./default.nix
     llvmShared = llvmSharedFor pkgsHostTarget;
 
     # Expose llvmPackages used for rustc from rustc via passthru for LTO in Firefox
-    llvmPackages =
-      if (stdenv.targetPlatform.useLLVM or false) then
-        callPackage (
-          {
-            pkgs,
-            bootBintoolsNoLibc ? if stdenv.targetPlatform.linker == "lld" then null else pkgs.bintoolsNoLibc,
-            bootBintools ? if stdenv.targetPlatform.linker == "lld" then null else pkgs.bintools,
-          }:
-          let
-            llvmPackages = llvmPackages_19;
-
-            setStdenv =
-              pkg:
-              pkg.override {
-                stdenv = stdenv.override {
-                  allowedRequisites = null;
-                  cc = pkgsBuildHost.llvmPackages_19.clangUseLLVM;
-                };
-              };
-          in
-          rec {
-            inherit (llvmPackages) bintools;
-
-            libunwind = setStdenv llvmPackages.libunwind;
-            llvm = setStdenv llvmPackages.llvm;
-
-            libcxx = llvmPackages.libcxx.override {
-              stdenv = stdenv.override {
-                allowedRequisites = null;
-                cc = pkgsBuildHost.llvmPackages_19.clangNoLibcxx;
-                hostPlatform = stdenv.hostPlatform // {
-                  useLLVM = !stdenv.hostPlatform.isDarwin;
-                };
-              };
-              inherit libunwind;
-            };
-
-            clangUseLLVM = llvmPackages.clangUseLLVM.override { inherit libcxx; };
-
-            stdenv = overrideCC args.stdenv clangUseLLVM;
-          }
-        ) { }
-      else
-        llvmPackages_19;
+    llvmPackages = llvmPackages_19;
 
     # Note: the version MUST be the same version that we are building. Upstream
     # ensures that each released compiler can compile itself:

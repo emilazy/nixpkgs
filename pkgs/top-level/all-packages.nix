@@ -15298,6 +15298,8 @@ with pkgs;
 
   inherit (rustPackages) cargo cargo-auditable cargo-auditable-cargo-wrapper clippy rustc rustPlatform;
 
+  rustc-wasm32 = pkgsCross.wasm32-unknown-none.buildPackages.rustc;
+
   makeRustPlatform = callPackage ../development/compilers/rust/make-rust-platform.nix { };
 
   buildRustCrate =

@@ -25,7 +25,6 @@
 let
   inherit (lib) optionals optional optionalString concatStringsSep;
   inherit (darwin.apple_sdk.frameworks) Security;
-  useLLVM = stdenv.targetPlatform.useLLVM or false;
 in stdenv.mkDerivation (finalAttrs: {
   pname = "${targetPackages.stdenv.cc.targetPrefix}rustc";
   inherit version;
@@ -66,14 +65,11 @@ in stdenv.mkDerivation (finalAttrs: {
 
   NIX_LDFLAGS = toString (
        # when linking stage1 libstd: cc: undefined reference to `__cxa_begin_catch'
-       # This doesn't apply to cross-building for FreeBSD because the host
-       # uses libstdc++, but the target (used for building std) uses libc++
-      optional (stdenv.hostPlatform.isLinux && !withBundledLLVM && !stdenv.targetPlatform.isFreeBSD && !useLLVM)
+      optional (stdenv.hostPlatform.isLinux && !withBundledLLVM && !stdenv.hostPlatform.useLLVM)
         "--push-state --as-needed -lstdc++ --pop-state"
-    ++ optional (stdenv.hostPlatform.isLinux && !withBundledLLVM && !stdenv.targetPlatform.isFreeBSD && useLLVM)
+    ++ optional (stdenv.hostPlatform.isLinux && !withBundledLLVM && stdenv.hostPlatform.useLLVM)
         "--push-state --as-needed -L${llvmPackages.libcxx}/lib -lc++ -lc++abi -lLLVM-${lib.versions.major llvmPackages.llvm.version} --pop-state"
     ++ optional (stdenv.hostPlatform.isDarwin && !withBundledLLVM) "-lc++ -lc++abi"
-    ++ optional stdenv.hostPlatform.isFreeBSD "-rpath ${llvmPackages.libunwind}/lib"
     ++ optional stdenv.hostPlatform.isDarwin "-rpath ${llvmSharedForHost.lib}/lib");
 
   # Increase codegen units to introduce parallelism within the compiler.
@@ -118,10 +114,6 @@ in stdenv.mkDerivation (finalAttrs: {
     "--target=${concatStringsSep "," ([
       stdenv.targetPlatform.rust.rustcTargetSpec
 
-    # Other targets that don't need any extra dependencies to build.
-    ] ++ optionals (!fastCross) [
-      "wasm32-unknown-unknown"
-
     # (build!=target): When cross-building a compiler we need to add
     # the build platform as well so rustc can compile build.rs
     # scripts.
@@ -160,7 +152,7 @@ in stdenv.mkDerivation (finalAttrs: {
     # doesn't work) to build a linker.
     "--disable-llvm-bitcode-linker"
   ] ++ optionals (stdenv.targetPlatform.isLinux && !(stdenv.targetPlatform.useLLVM or false)) [
-    "--enable-profiler" # build libprofiler_builtins
+    "${setTarget}.profiler=true" # build libprofiler_builtins
   ] ++ optionals stdenv.buildPlatform.isMusl [
     "${setBuild}.musl-root=${pkgsBuildBuild.targetPackages.stdenv.cc.libc}"
   ] ++ optionals stdenv.hostPlatform.isMusl [
@@ -172,9 +164,10 @@ in stdenv.mkDerivation (finalAttrs: {
   ] ++ optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64) [
     # https://github.com/rust-lang/rust/issues/92173
     "--set rust.jemalloc"
-  ] ++ optionals (useLLVM && !stdenv.targetPlatform.isFreeBSD) [
+  ] ++ optionals (stdenv.targetPlatform.useLLVM && !stdenv.targetPlatform.isFreeBSD) [
     # https://github.com/NixOS/nixpkgs/issues/311930
-    "--llvm-libunwind=${if withBundledLLVM then "in-tree" else "system"}"
+    "${setTarget}.llvm-libunwind=${if withBundledLLVM then "in-tree" else "system"}"
+  ] ++ optionals stdenv.hostPlatform.useLLVM [
     "--enable-use-libcxx"
   ];
 
@@ -262,7 +255,7 @@ in stdenv.mkDerivation (finalAttrs: {
   buildInputs = [ openssl ]
     ++ optionals stdenv.hostPlatform.isDarwin [ libiconv Security zlib ]
     ++ optional (!withBundledLLVM) llvmShared.lib
-    ++ optional (useLLVM && !withBundledLLVM && !stdenv.targetPlatform.isFreeBSD) [
+    ++ optional (stdenv.hostPlatform.useLLVM && !withBundledLLVM && !stdenv.hostPlatform.isFreeBSD) [
       llvmPackages.libunwind
       # Hack which is used upstream https://github.com/gentoo/gentoo/blob/master/dev-lang/rust/rust-1.78.0.ebuild#L284
       (runCommandLocal "libunwind-libgcc" {} ''

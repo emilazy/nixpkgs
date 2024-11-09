@@ -11,7 +11,7 @@
   nodejs,
   npmHooks,
   python3,
-  rustc,
+  rustc-wasm32,
   wasm-bindgen-cli,
   wasm-pack,
 }:
@@ -117,8 +117,8 @@ rustPlatform.buildRustPackage rec {
       binaryen
       gzip
       nodejs
-      rustc
-      rustc.llvmPackages.lld
+      rustc-wasm32
+      rustc-wasm32.llvmPackages.lld
       wasm-bindgen-92
       wasm-pack
       httplz

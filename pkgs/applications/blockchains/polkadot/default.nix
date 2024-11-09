@@ -7,7 +7,7 @@
   rocksdb_8_3,
   rust-jemalloc-sys-unprefixed,
   rustPlatform,
-  rustc,
+  rustc-wasm32,
   stdenv,
   Security,
   SystemConfiguration,
@@ -67,8 +67,8 @@ rustPlatform.buildRustPackage rec {
   nativeBuildInputs = [
     pkg-config
     rustPlatform.bindgenHook
-    rustc
-    rustc.llvmPackages.lld
+    rustc-wasm32
+    rustc-wasm32.llvmPackages.lld
   ];
 
   # NOTE: jemalloc is used by default on Linux with unprefixed enabled

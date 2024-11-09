@@ -222,6 +222,7 @@ stdenv.mkDerivation ({
     # "All of the code in the compiler-rt project is dual licensed under the MIT
     # license and the UIUC License (a BSD-like license)":
     license = with lib.licenses; [ mit ncsa ];
+    platforms = llvm_meta.platforms ++ [ "wasm32-none" ];
     broken =
       # compiler-rt requires a Clang stdenv on 32-bit RISC-V:
       # https://reviews.llvm.org/D43106#1019077
