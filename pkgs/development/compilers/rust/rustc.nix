@@ -36,12 +36,6 @@ in stdenv.mkDerivation (finalAttrs: {
     passthru.isReleaseTarball = true;
   };
 
-  hardeningDisable = optionals stdenv.cc.isClang [
-    # remove once https://github.com/NixOS/nixpkgs/issues/318674 is
-    # addressed properly
-    "zerocallusedregs"
-  ];
-
   __darwinAllowLocalNetworking = true;
 
   # rustc complains about modified source files otherwise
