@@ -151,6 +151,7 @@ in stdenv.mkDerivation (finalAttrs: {
     "${setHost}.crt-static=${lib.boolToString stdenv.hostPlatform.isStatic}"
     "${setTarget}.crt-static=${lib.boolToString stdenv.targetPlatform.isStatic}"
   ] ++ optionals (!withBundledLLVM) [
+    "--set=llvm.download-ci-llvm=false"
     "--enable-llvm-link-shared"
     "${setBuild}.llvm-config=${llvmSharedForBuild.dev}/bin/llvm-config"
     "${setHost}.llvm-config=${llvmSharedForHost.dev}/bin/llvm-config"
@@ -223,7 +224,7 @@ in stdenv.mkDerivation (finalAttrs: {
     substituteInPlace compiler/rustc_target/src/spec/*/*.rs \
       --replace-quiet '"rust-lld"' '"lld"'
 
-    ${optionalString (!withBundledLLVM) "rm -rf src/llvm"}
+    ${optionalString (!withBundledLLVM) "rm -r src/llvm-project"}
 
     # Useful debugging parameter
     # export VERBOSE=1
