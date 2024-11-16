@@ -10681,10 +10681,9 @@ with pkgs;
     inherit (darwin.apple_sdk_11_0.frameworks) Cocoa AGL OpenGL;
   };
 
-  pcre = callPackage ../development/libraries/pcre { };
-  pcre16 = res.pcre.override { variant = "pcre16"; };
-  # pcre32 seems unused
-  pcre-cpp = res.pcre.override { variant = "cpp"; };
+  pcre = pcre2;
+  pcre16 = pcre2;
+  pcre-cpp = pcre2;
 
   pcre2 = callPackage ../development/libraries/pcre2 { };
 
