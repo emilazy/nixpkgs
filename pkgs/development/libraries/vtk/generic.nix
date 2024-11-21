@@ -1,5 +1,6 @@
 { majorVersion, minorVersion, sourceSha256, patchesToFetch ? [] }:
 { stdenv, lib, fetchurl, cmake, libGLU, libGL, libX11, xorgproto, libXt, libpng, libtiff
+, hdf5, cgns
 , fetchpatch
 , enableQt ? false, qtx11extras, qttools, qtdeclarative, qtEnv
 , enablePython ? false, python ? throw "vtk: Python support requested, but no python interpreter was given."
@@ -28,8 +29,13 @@ in stdenv.mkDerivation {
 
   nativeBuildInputs = [ cmake ];
 
-  buildInputs = [ libpng libtiff ]
-    ++ optionals enableQt [ (qtEnv "qvtk-qt-env" [ qtx11extras qttools qtdeclarative ]) ]
+  buildInputs =
+    [
+      libpng
+      libtiff
+      hdf5
+      cgns
+    ] ++ optionals enableQt [ (qtEnv "qvtk-qt-env" [ qtx11extras qttools qtdeclarative ]) ]
     ++ optionals stdenv.hostPlatform.isLinux [
       libGLU
       xorgproto
@@ -82,6 +88,8 @@ in stdenv.mkDerivation {
     "-DCMAKE_CXX_FLAGS=-fPIC"
     "-DVTK_MODULE_USE_EXTERNAL_vtkpng=ON"
     "-DVTK_MODULE_USE_EXTERNAL_vtktiff=1"
+    "-DVTK_MODULE_USE_EXTERNAL_vtkhdf5=ON"
+    "-DVTK_MODULE_USE_EXTERNAL_cgns=ON"
     "-DVTK_MODULE_ENABLE_VTK_RenderingExternal=YES"
   ] ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [
     "-DOPENGL_INCLUDE_DIR=${libGL}/include"
