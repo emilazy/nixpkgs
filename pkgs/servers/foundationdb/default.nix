@@ -1,7 +1,7 @@
 { gccStdenv, llvmPackages
 , lib, fetchFromGitHub, fetchpatch
 
-, cmake, ninja, python3, openjdk8, mono, openssl, boost178
+, cmake, ninja, python3, openjdk8, mono, openssl, boost
 , pkg-config, msgpack-cxx, toml11
 }@args:
 
@@ -9,9 +9,9 @@ let
   cmakeBuild = import ./cmake.nix args;
 in {
   foundationdb71 = cmakeBuild {
-    version = "7.1.32";
-    hash    = "sha256-CNJ4w1ECadj2KtcfbBPBQpXQeq9BAiw54hUgRTWPFzY=";
-    boost   = boost178;
+    version = "7.1.60";
+    hash    = "sha256-rBksJ/prkDb+vpEkTLXOeASQKjOOt8iB8JrumnxTayo=";
+    inherit boost;
     ssl     = openssl;
 
     patches = [
