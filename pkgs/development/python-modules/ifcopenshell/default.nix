@@ -14,7 +14,7 @@
   swig,
   # native dependencies
   eigen,
-  boost179,
+  boost,
   cgal,
   gmp,
   hdf5,
@@ -77,7 +77,7 @@ buildPythonPackage rec {
   buildInputs = [
     # ifcopenshell needs stdc++
     (lib.getLib stdenv.cc.cc)
-    boost179
+    boost
     cgal
     eigen
     gmp
