@@ -1,7 +1,7 @@
 { gccStdenv, llvmPackages
 , lib, fetchFromGitHub, fetchpatch
 
-, cmake, ninja, python3, openjdk8, mono, openssl, boost178
+, cmake, ninja, python3, openjdk8, mono, openssl, boost
 , pkg-config, msgpack-cxx, toml11
 }@args:
 
@@ -11,7 +11,7 @@ in {
   foundationdb71 = cmakeBuild {
     version = "7.1.60";
     hash    = "sha256-rBksJ/prkDb+vpEkTLXOeASQKjOOt8iB8JrumnxTayo=";
-    boost   = boost178;
+    inherit boost;
     ssl     = openssl;
 
     patches = [

@@ -86,6 +86,20 @@ let
 
         inherit patches;
 
+        postPatch = ''
+          # allow using any msgpack-cxx version
+          substituteInPlace cmake/GetMsgpack.cmake \
+            --replace-warn 'find_package(msgpack-cxx 6 QUIET CONFIG)' 'find_package(msgpack-cxx QUIET CONFIG)'
+
+          # Upstream upgraded to Boost 1.86 on the 7.3 branch with no
+          # code changes; see:
+          # <https://github.com/apple/foundationdb/pull/11788>
+          substituteInPlace cmake/CompileBoost.cmake \
+            --replace-fail \
+              'find_package(Boost 1.78.0 ' \
+              'find_package(Boost 1.86.0 '
+        '';
+
         # the install phase for cmake is pretty wonky right now since it's not designed to
         # coherently install packages as most linux distros expect -- it's designed to build
         # packaged artifacts that are shipped in RPMs, etc. we need to add some extra code to
