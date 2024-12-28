@@ -5,7 +5,7 @@
 , msgpack-cxx, toml11
 
 , gccStdenv, llvmPackages
-, useClang ? false
+, useClang ? true
 , ...
 }:
 
