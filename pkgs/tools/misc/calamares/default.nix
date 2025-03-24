@@ -1,13 +1,14 @@
-{ lib, fetchurl, cmake, ninja, extra-cmake-modules, kparts, kpmcore, kirigami2
-, kservice, libatasmart, libxcb, yaml-cpp, libpwquality, parted, polkit-qt, python3
-, qtbase, qtquickcontrols, qtsvg, qttools, qtwebengine, util-linux, tzdata
-, ckbcomp, xkeyboard_config, mkDerivation
+{ stdenv, lib, fetchurl, cmake, ninja, pkg-config, extra-cmake-modules
+, kcoreaddons, kparts, kpmcore, kservice
+, libatasmart, yaml-cpp, libxcrypt, libpwquality, parted, polkit-qt-1, python3
+, qtbase, qttools, qtwebengine, wrapQtAppsHook, util-linux, tzdata
+, ckbcomp, xkeyboard_config
 , nixos-extensions ? false
 # passthru.tests
 , calamares-nixos
 }:
 
-mkDerivation rec {
+stdenv.mkDerivation rec {
   pname = "calamares";
   version = "3.3.14";
 
@@ -34,11 +35,11 @@ mkDerivation rec {
     ./0008-Change-default-location-where-calamares-searches-for.patch
   ];
 
-  nativeBuildInputs = [ cmake ninja extra-cmake-modules ];
+  nativeBuildInputs = [ cmake ninja pkg-config extra-cmake-modules wrapQtAppsHook ];
   buildInputs = [
-    kparts.dev kpmcore.out kservice.dev kirigami2
-    libatasmart libxcb yaml-cpp libpwquality parted polkit-qt python3
-    qtbase qtquickcontrols qtsvg qttools qtwebengine.dev util-linux
+    kcoreaddons kparts kpmcore kservice
+    libatasmart yaml-cpp libxcrypt libpwquality parted polkit-qt-1 python3
+    qtbase qttools qtwebengine.dev util-linux
   ];
 
   POLKITQT-1_POLICY_FILES_INSTALL_DIR = "$(out)/share/polkit-1/actions";

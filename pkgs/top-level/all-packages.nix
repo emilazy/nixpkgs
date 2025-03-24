@@ -2023,8 +2023,9 @@ with pkgs;
     '';
   });
 
-  calamares = libsForQt5.callPackage ../tools/misc/calamares { };
+  calamares = kdePackages.callPackage ../tools/misc/calamares { };
   calamares-nixos = lowPrio (calamares.override { nixos-extensions = true; });
+
   candle = libsForQt5.callPackage ../applications/misc/candle { };
 
   capstone = callPackage ../development/libraries/capstone { };
