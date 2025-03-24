@@ -41,12 +41,6 @@ mkDerivation rec {
     qtbase qtquickcontrols qtsvg qttools qtwebengine.dev util-linux
   ];
 
-  cmakeFlags = [
-    "-DPYTHON_LIBRARY=${python}/lib/lib${python.libPrefix}.so"
-    "-DPYTHON_INCLUDE_DIR=${python}/include/${python.libPrefix}"
-    "-DWITH_PYTHONQT:BOOL=ON"
-  ];
-
   POLKITQT-1_POLICY_FILES_INSTALL_DIR = "$(out)/share/polkit-1/actions";
 
   postPatch = ''
