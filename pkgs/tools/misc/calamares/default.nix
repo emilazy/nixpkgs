@@ -1,4 +1,4 @@
-{ lib, fetchurl, boost, cmake, extra-cmake-modules, kparts, kpmcore, kirigami2
+{ lib, fetchurl, cmake, ninja, extra-cmake-modules, kparts, kpmcore, kirigami2
 , kservice, libatasmart, libxcb, yaml-cpp, libpwquality, parted, polkit-qt, python
 , qtbase, qtquickcontrols, qtsvg, qttools, qtwebengine, util-linux, tzdata
 , ckbcomp, xkeyboard_config, mkDerivation
@@ -34,7 +34,7 @@ mkDerivation rec {
     ./0008-Change-default-location-where-calamares-searches-for.patch
   ];
 
-  nativeBuildInputs = [ cmake extra-cmake-modules ];
+  nativeBuildInputs = [ cmake ninja extra-cmake-modules ];
   buildInputs = [
     boost kparts.dev kpmcore.out kservice.dev kirigami2
     libatasmart libxcb yaml-cpp libpwquality parted polkit-qt python
@@ -44,7 +44,6 @@ mkDerivation rec {
   cmakeFlags = [
     "-DPYTHON_LIBRARY=${python}/lib/lib${python.libPrefix}.so"
     "-DPYTHON_INCLUDE_DIR=${python}/include/${python.libPrefix}"
-    "-DCMAKE_VERBOSE_MAKEFILE=True"
     "-DWITH_PYTHONQT:BOOL=ON"
   ];
 
