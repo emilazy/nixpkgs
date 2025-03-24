@@ -24,7 +24,7 @@ index 1b892dce1..ee80a934b 100644
  </RCC>
 diff --git a/src/modules/packagechooserq/packagechooserq@unfree.qml b/src/modules/packagechooserq/packagechooserq@unfree.qml
 new file mode 100644
-index 000000000..5e36d77d9
+index 000000000..8a009dfba
 --- /dev/null
 +++ b/src/modules/packagechooserq/packagechooserq@unfree.qml
 @@ -0,0 +1,75 @@

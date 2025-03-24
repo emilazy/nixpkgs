@@ -6,30 +6,32 @@ Subject: [PATCH] Fix setting the kayboard layout on GNOME wayland.
 By default the module uses the setxkbmap, which will not change the
 keyboard
 ---
- src/modules/keyboard/Config.cpp | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/modules/keyboard/Config.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/src/modules/keyboard/Config.cpp b/src/modules/keyboard/Config.cpp
-index 54ee7649c..60fe2d7d0 100644
+index 47c81a347..dd1ecb2b4 100644
 --- a/src/modules/keyboard/Config.cpp
 +++ b/src/modules/keyboard/Config.cpp
-@@ -306,6 +306,10 @@ Config::applyXkb()
-                                                   m_additionalLayoutInfo.groupSwitcher ) );
+@@ -250,6 +250,12 @@ applyXkb( const BasicLayoutInfo& settings, AdditionalLayoutInfo& extra )
+                                                   extra.groupSwitcher ) );
          QProcess::execute( "setxkbmap", basicArguments );
  
 +        QString xkbmap = QString( "[('xkb','%1\%2'),('xkb','%3\%4')]").arg(
-+                                  m_selectedLayout, ((!m_selectedVariant.isEmpty()) ? "+" + m_selectedVariant : ""),
-+                                  m_additionalLayoutInfo.additionalLayout, ((!m_additionalLayoutInfo.additionalVariant.isEmpty()) ? "+" + m_additionalLayoutInfo.additionalVariant : ""));
++                                  settings.selectedLayout, ((!settings.selectedVariant.isEmpty()) ? "+" + settings.selectedVariant : ""),
++                                  extra.additionalLayout, ((!extra.additionalVariant.isEmpty()) ? "+" + extra.additionalVariant : ""));
 +        QProcess::execute( "sh", { "-c", "if command -v gsettings; then gsettings set org.gnome.desktop.input-sources sources \"$0\"; fi", xkbmap });
-         cDebug() << "xkbmap selection changed to: " << m_selectedLayout << '-' << m_selectedVariant << "(added "
-                  << m_additionalLayoutInfo.additionalLayout << "-" << m_additionalLayoutInfo.additionalVariant
++
++
+         cDebug() << "xkbmap selection changed to: " << settings.selectedLayout << '-' << settings.selectedVariant
+                  << "(added " << extra.additionalLayout << "-" << extra.additionalVariant
                   << " since current layout is not ASCII-capable)";
-@@ -314,6 +318,8 @@ Config::applyXkb()
+@@ -258,6 +264,8 @@ applyXkb( const BasicLayoutInfo& settings, AdditionalLayoutInfo& extra )
      {
-         basicArguments.append( xkbmap_layout_args( m_selectedLayout, m_selectedVariant ) );
+         basicArguments.append( xkbmap_layout_args( settings.selectedLayout, settings.selectedVariant ) );
          QProcess::execute( "setxkbmap", basicArguments );
-+        QString xkbmap = QString( "[('xkb','%1\%2')]").arg( m_selectedLayout, ((!m_selectedVariant.isEmpty()) ? "+" + m_selectedVariant : "") );
++        QString xkbmap = QString( "[('xkb','%1\%2')]").arg( settings.selectedLayout, ((!settings.selectedVariant.isEmpty()) ? "+" + settings.selectedVariant: "") );
 +        QProcess::execute( "sh", { "-c", "if command -v gsettings; then gsettings set org.gnome.desktop.input-sources sources \"$0\"; fi", xkbmap });
-         cDebug() << "xkbmap selection changed to: " << m_selectedLayout << '-' << m_selectedVariant;
+         cDebug() << "xkbmap selection changed to: " << settings.selectedLayout << '-' << settings.selectedVariant;
      }
-     m_applyTimer.stop();
+ }

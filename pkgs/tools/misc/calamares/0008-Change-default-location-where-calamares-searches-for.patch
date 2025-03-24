@@ -8,7 +8,7 @@ Subject: [PATCH] Change default location where calamares searches for locales
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/modules/locale/Config.cpp b/src/modules/locale/Config.cpp
-index 8fa17a768..79b5419b6 100644
+index 3e27a5227..19be00331 100644
 --- a/src/modules/locale/Config.cpp
 +++ b/src/modules/locale/Config.cpp
 @@ -48,7 +48,7 @@ loadLocales( const QString& localeGenPath )

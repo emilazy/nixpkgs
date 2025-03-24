@@ -65,7 +65,7 @@ index 4a16f8872..6d32916a5 100644
          device = partition["device"]
  
 diff --git a/src/modules/welcome/checker/GeneralRequirements.cpp b/src/modules/welcome/checker/GeneralRequirements.cpp
-index a58f3df83..b66576b09 100644
+index 693f81248..cdd12c5a1 100644
 --- a/src/modules/welcome/checker/GeneralRequirements.cpp
 +++ b/src/modules/welcome/checker/GeneralRequirements.cpp
 @@ -431,10 +431,35 @@ GeneralRequirements::checkEnoughStorage( qint64 requiredSpace )

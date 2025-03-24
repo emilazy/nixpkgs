@@ -11,10 +11,10 @@ Modifies packagechooser module to change the UI.
  3 files changed, 23 insertions(+), 18 deletions(-)
 
 diff --git a/src/modules/finished/FinishedPage.cpp b/src/modules/finished/FinishedPage.cpp
-index 51be52678..307607232 100644
+index a31595f91..0f30744d3 100644
 --- a/src/modules/finished/FinishedPage.cpp
 +++ b/src/modules/finished/FinishedPage.cpp
-@@ -74,8 +74,10 @@ FinishedPage::retranslate()
+@@ -76,8 +76,10 @@ FinishedPage::retranslate()
          {
              ui->mainText->setText( tr( "<h1>All done.</h1><br/>"
                                         "%1 has been set up on your computer.<br/>"
@@ -27,7 +27,7 @@ index 51be52678..307607232 100644
                                         .arg( branding->versionedName() ) );
              ui->restartCheckBox->setToolTip( tr( "<html><head/><body>"
                                                   "<p>When this box is checked, your system will "
-@@ -89,8 +91,10 @@ FinishedPage::retranslate()
+@@ -91,8 +93,10 @@ FinishedPage::retranslate()
              ui->mainText->setText( tr( "<h1>All done.</h1><br/>"
                                         "%1 has been installed on your computer.<br/>"
                                         "You may now restart into your new system, or continue "

@@ -9,10 +9,10 @@ Subject: [PATCH] Remove options for unsupported partition types
  2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/src/modules/partition/gui/CreatePartitionDialog.cpp b/src/modules/partition/gui/CreatePartitionDialog.cpp
-index d18676138..60bb8fdaf 100644
+index 213f5c793..57dfb3ef6 100644
 --- a/src/modules/partition/gui/CreatePartitionDialog.cpp
 +++ b/src/modules/partition/gui/CreatePartitionDialog.cpp
-@@ -108,7 +108,8 @@ CreatePartitionDialog::CreatePartitionDialog( Device* device,
+@@ -104,7 +104,8 @@ CreatePartitionDialog::CreatePartitionDialog( PartitionCoreModule* core,
      {
          // We need to ensure zfs is added to the list if the zfs module is enabled
          if ( ( fs->type() == FileSystem::Type::Zfs && Calamares::Settings::instance()->isModuleEnabled( "zfs" ) )
@@ -23,10 +23,10 @@ index d18676138..60bb8fdaf 100644
              fsNames << userVisibleFS( fs );  // This is put into the combobox
              if ( fs->type() == defaultFSType )
 diff --git a/src/modules/partition/gui/EditExistingPartitionDialog.cpp b/src/modules/partition/gui/EditExistingPartitionDialog.cpp
-index 7a3f4951a..4c3bfc4b0 100644
+index 2b9b9405b..669e06b60 100644
 --- a/src/modules/partition/gui/EditExistingPartitionDialog.cpp
 +++ b/src/modules/partition/gui/EditExistingPartitionDialog.cpp
-@@ -113,7 +113,8 @@ EditExistingPartitionDialog::EditExistingPartitionDialog( Device* device,
+@@ -120,7 +120,8 @@ EditExistingPartitionDialog::EditExistingPartitionDialog( PartitionCoreModule* c
      {
          // We need to ensure zfs is added to the list if the zfs module is enabled
          if ( ( fs->type() == FileSystem::Type::Zfs && Calamares::Settings::instance()->isModuleEnabled( "zfs" ) )
