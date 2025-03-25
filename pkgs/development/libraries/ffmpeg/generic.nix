@@ -479,7 +479,12 @@ stdenv.mkDerivation (
       [
         #mingw64 is internally treated as mingw32, so 32 and 64 make no difference here
         "--target_os=${
-          if stdenv.hostPlatform.isMinGW then "mingw64" else stdenv.hostPlatform.parsed.kernel.name
+          if stdenv.hostPlatform.isMinGW then
+            "mingw64"
+          else if stdenv.hostPlatform.isDarwin then
+            "darwin"
+          else
+            stdenv.hostPlatform.parsed.kernel.name
         }"
         "--arch=${stdenv.hostPlatform.parsed.cpu.name}"
         "--pkg-config=${buildPackages.pkg-config.targetPrefix}pkg-config"

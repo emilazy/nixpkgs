@@ -11,7 +11,7 @@ let
 
   systemSpecific =
     {
-      darwin = rec {
+      macosx = rec {
         systemTag = "nix-darwin";
         capitalized = systemTag;
         fontFile = "JoyPixels-SBIX.ttf";

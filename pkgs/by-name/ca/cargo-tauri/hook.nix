@@ -28,7 +28,7 @@ makeSetupHook {
     # https://github.com/tauri-apps/tauri/blob/23a912bb84d7c6088301e1ffc59adfa8a799beab/README.md#platforms
     defaultTauriBundleType =
       {
-        darwin = "app";
+        macosx = "app";
         linux = "deb";
       }
       .${kernelName} or (throw "${kernelName} is not supported by cargo-tauri.hook");
@@ -36,7 +36,7 @@ makeSetupHook {
     # $targetDir is the path to the build artifacts (i.e., `./target/release`)
     installScript =
       {
-        darwin = ''
+        macosx = ''
           mkdir $out
           mv "$targetDir"/bundle/macos $out/Applications
         '';

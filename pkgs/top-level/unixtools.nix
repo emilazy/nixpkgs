@@ -80,23 +80,23 @@ let
     # singular binaries
     arp = {
       linux = pkgs.nettools;
-      darwin = pkgs.darwin.network_cmds;
+      macosx = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.arp;
     };
     col = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.text_cmds;
+      macosx = pkgs.darwin.text_cmds;
     };
     column = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.text_cmds;
+      macosx = pkgs.darwin.text_cmds;
     };
     eject = {
       linux = pkgs.util-linux;
     };
     getconf = {
       linux = if stdenv.hostPlatform.libc == "glibc" then pkgs.stdenv.cc.libc else pkgs.netbsd.getconf;
-      darwin = pkgs.darwin.system_cmds;
+      macosx = pkgs.darwin.system_cmds;
       # I don't see any obvious arg exec in the doc/manpage
       binlore = ''
         execer cannot bin/getconf
@@ -105,46 +105,46 @@ let
     getent = {
       linux =
         if stdenv.hostPlatform.libc == "glibc" then pkgs.stdenv.cc.libc.getent else pkgs.netbsd.getent;
-      darwin = pkgs.netbsd.getent;
+      macosx = pkgs.netbsd.getent;
       freebsd = pkgs.freebsd.getent;
       openbsd = pkgs.openbsd.getent;
     };
     getopt = {
       linux = pkgs.util-linux;
-      darwin = pkgs.getopt;
+      macosx = pkgs.getopt;
     };
     fdisk = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.diskdev_cmds;
+      macosx = pkgs.darwin.diskdev_cmds;
       freebsd = pkgs.freebsd.fdisk;
     };
     fsck = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.diskdev_cmds;
+      macosx = pkgs.darwin.diskdev_cmds;
     };
     hexdump = {
       linux = pkgs.util-linuxMinimal;
-      darwin = pkgs.darwin.shell_cmds;
+      macosx = pkgs.darwin.shell_cmds;
     };
     hostname = {
       linux = pkgs.nettools;
-      darwin = pkgs.darwin.shell_cmds;
+      macosx = pkgs.darwin.shell_cmds;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.hostname;
     };
     ifconfig = {
       linux = pkgs.nettools;
-      darwin = pkgs.darwin.network_cmds;
+      macosx = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.ifconfig;
       openbsd = pkgs.openbsd.ifconfig;
     };
     killall = {
       linux = pkgs.psmisc;
-      darwin = pkgs.darwin.shell_cmds;
+      macosx = pkgs.darwin.shell_cmds;
     };
     locale = {
       linux = pkgs.glibc;
-      darwin = pkgs.darwin.adv_cmds;
+      macosx = pkgs.darwin.adv_cmds;
       freebsd = pkgs.freebsd.locale;
       # technically just targeting glibc version
       # no obvious exec in manpage
@@ -157,11 +157,11 @@ let
     };
     more = {
       linux = pkgs.util-linux;
-      darwin = more_compat;
+      macosx = more_compat;
     };
     mount = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.diskdev_cmds;
+      macosx = pkgs.darwin.diskdev_cmds;
       freebsd = freebsd.mount;
       openbsd = pkgs.openbsd.mount;
       # technically just targeting the darwin version; binlore already
@@ -174,17 +174,17 @@ let
     };
     netstat = {
       linux = pkgs.nettools;
-      darwin = pkgs.darwin.network_cmds;
+      macosx = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.netstat;
     };
     ping = {
       linux = pkgs.iputils;
-      darwin = pkgs.darwin.network_cmds;
+      macosx = pkgs.darwin.network_cmds;
       freebsd = freebsd.ping;
     };
     ps = {
       linux = pkgs.procps;
-      darwin = pkgs.darwin.ps;
+      macosx = pkgs.darwin.ps;
       freebsd = pkgs.freebsd.bin;
       openbsd = pkgs.openbsd.ps;
       # technically just targeting procps ps (which ids as can)
@@ -196,27 +196,27 @@ let
     };
     quota = {
       linux = pkgs.linuxquota;
-      darwin = pkgs.darwin.diskdev_cmds;
+      macosx = pkgs.darwin.diskdev_cmds;
     };
     route = {
       linux = pkgs.nettools;
-      darwin = pkgs.darwin.network_cmds;
+      macosx = pkgs.darwin.network_cmds;
       freebsd = pkgs.freebsd.route;
       openbsd = pkgs.openbsd.route;
     };
     script = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.shell_cmds;
+      macosx = pkgs.darwin.shell_cmds;
     };
     sysctl = {
       linux = pkgs.procps;
-      darwin = pkgs.darwin.system_cmds;
+      macosx = pkgs.darwin.system_cmds;
       freebsd = pkgs.freebsd.sysctl;
       openbsd = pkgs.openbsd.sysctl;
     };
     top = {
       linux = pkgs.procps;
-      darwin = pkgs.darwin.top;
+      macosx = pkgs.darwin.top;
       freebsd = pkgs.freebsd.top;
       openbsd = pkgs.openbsd.top;
       # technically just targeting procps top; haven't needed this in
@@ -229,11 +229,11 @@ let
     };
     umount = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.diskdev_cmds;
+      macosx = pkgs.darwin.diskdev_cmds;
     };
     whereis = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.shell_cmds;
+      macosx = pkgs.darwin.shell_cmds;
     };
     wall = {
       linux = pkgs.util-linux;
@@ -243,17 +243,17 @@ let
 
       # watch is the only command from procps that builds currently on
       # Darwin/FreeBSD. Unfortunately no other implementations exist currently!
-      darwin = pkgs.callPackage ../os-specific/linux/procps-ng { };
+      macosx = pkgs.callPackage ../os-specific/linux/procps-ng { };
       freebsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
       openbsd = pkgs.callPackage ../os-specific/linux/procps-ng { };
     };
     write = {
       linux = pkgs.util-linux;
-      darwin = pkgs.darwin.basic_cmds;
+      macosx = pkgs.darwin.basic_cmds;
     };
     xxd = {
       linux = pkgs.tinyxxd;
-      darwin = pkgs.tinyxxd;
+      macosx = pkgs.tinyxxd;
       freebsd = pkgs.tinyxxd;
     };
   };

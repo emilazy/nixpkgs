@@ -569,12 +569,9 @@ rec {
       inherit (kernelFamilies) bsd darwin;
     in
     setTypes types.openKernel {
-      # TODO(@Ericson2314): Don't want to mass-rebuild yet to keeping 'darwin' as
-      # the normalized name for macOS.
-      macos = {
+      macosx = {
         execFormat = macho;
         families = { inherit darwin; };
-        name = "darwin";
       };
       ios = {
         execFormat = macho;
@@ -633,7 +630,8 @@ rec {
     // {
       # aliases
       # 'darwin' is the kernel for all of them. We choose macOS by default.
-      darwin = kernels.macos;
+      darwin = kernels.macosx;
+      macos = kernels.macosx;
       watchos = kernels.ios;
       tvos = kernels.ios;
       win32 = kernels.windows;
@@ -901,6 +899,8 @@ rec {
         kernel =
           if hasPrefix "darwin" args.kernel then
             getKernel "darwin"
+          else if hasPrefix "macos" args.kernel then
+            getKernel "macosx"
           else if hasPrefix "netbsd" args.kernel then
             getKernel "netbsd"
           else

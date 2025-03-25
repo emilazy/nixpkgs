@@ -59,7 +59,14 @@ stdenv.mkDerivation (finalAttrs: {
   '';
 
   makeFlags = [
-    "SYSTEM=${if stdenv.hostPlatform.isMinGW then "mingw" else stdenv.hostPlatform.parsed.kernel.name}"
+    "SYSTEM=${
+      if stdenv.hostPlatform.isMinGW then
+        "mingw"
+      else if stdenv.hostPlatform.isDarwin then
+        "darwin"
+      else
+        stdenv.hostPlatform.parsed.kernel.name
+    }"
     "CC:=$(CC)"
     "LD:=$(CC)"
   ];

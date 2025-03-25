@@ -252,7 +252,13 @@ let
   };
 
   # win32 is added by Fedora’s patch
-  machdep = if stdenv.hostPlatform.isWindows then "win32" else stdenv.hostPlatform.parsed.kernel.name;
+  machdep =
+    if stdenv.hostPlatform.isWindows then
+      "win32"
+    else if stdenv.hostPlatform.isDarwin then
+      "darwin"
+    else
+      stdenv.hostPlatform.parsed.kernel.name;
 
   # https://github.com/python/cpython/blob/e488e300f5c01289c10906c2e53a8e43d6de32d8/configure.ac#L428
   # The configure script uses "arm" as the CPU name for all 32-bit ARM

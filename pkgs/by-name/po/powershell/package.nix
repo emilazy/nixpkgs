@@ -25,7 +25,7 @@ let
   ext = stdenv.hostPlatform.extensions.sharedLibrary;
   platformLdLibraryPath =
     {
-      darwin = "DYLD_FALLBACK_LIBRARY_PATH";
+      macosx = "DYLD_FALLBACK_LIBRARY_PATH";
       linux = "LD_LIBRARY_PATH";
     }
     .${stdenv.hostPlatform.parsed.kernel.name} or (throw "unsupported platform");

@@ -87,12 +87,19 @@ stdenv.mkDerivation (finalAttrs: {
     ./go_no_vendor_checks-1.23.patch
   ];
 
-  GOOS = if stdenv.targetPlatform.isWasi then "wasip1" else stdenv.targetPlatform.parsed.kernel.name;
+  GOOS =
+    if stdenv.targetPlatform.isWasi then
+      "wasip1"
+    else if stdenv.targetPlatform.isDarwin then
+      "darwin"
+    else
+      stdenv.targetPlatform.parsed.kernel.name;
   GOARCH = goarch stdenv.targetPlatform;
   # GOHOSTOS/GOHOSTARCH must match the building system, not the host system.
   # Go will nevertheless build a for host system that we will copy over in
   # the install phase.
-  GOHOSTOS = stdenv.buildPlatform.parsed.kernel.name;
+  GOHOSTOS =
+    if stdenv.buildPlatform.isDarwin then "darwin" else stdenv.buildPlatform.parsed.kernel.name;
   GOHOSTARCH = goarch stdenv.buildPlatform;
 
   # {CC,CXX}_FOR_TARGET must be only set for cross compilation case as go expect those

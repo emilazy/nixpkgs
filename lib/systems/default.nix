@@ -191,7 +191,7 @@ let
               {
                 linux = "Linux";
                 windows = "Windows";
-                darwin = "Darwin";
+                macosx = "Darwin";
                 netbsd = "NetBSD";
                 freebsd = "FreeBSD";
                 openbsd = "OpenBSD";
@@ -435,7 +435,7 @@ let
               os =
                 if rust ? platform then
                   rust.platform.os or "none"
-                else if final.isDarwin then
+                else if final.isMacOS then
                   "macos"
                 else if final.isWasm && !final.isWasi then
                   "unknown" # Needed for {wasm32,wasm64}-unknown-unknown.
@@ -485,6 +485,7 @@ let
                   }
                   .${cpu.name} or cpu.name;
                 vendor_ = final.rust.platform.vendor;
+                kernel_ = if kernel.name == "macosx" then "darwin" else kernel.name;
               in
               # TODO: deprecate args.rustc in favour of args.rust after 23.05 is EOL.
               args.rust.rustcTarget or args.rustc.config or (
@@ -495,7 +496,7 @@ let
                 if final.isWasi then
                   "${cpu_}-wasip1"
                 else
-                  "${cpu_}-${vendor_}-${kernel.name}${optionalString (abi.name != "unknown") "-${abi.name}"}"
+                  "${cpu_}-${vendor_}-${kernel_}${optionalString (abi.name != "unknown") "-${abi.name}"}"
               );
 
             # The name of the rust target if it is standard, or the json file

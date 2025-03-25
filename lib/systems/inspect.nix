@@ -306,7 +306,7 @@ rec {
     ];
 
     isMacOS = {
-      kernel = kernels.macos;
+      kernel = kernels.macosx;
     };
     isiOS = {
       kernel = kernels.ios;

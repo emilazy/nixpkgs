@@ -148,6 +148,7 @@ in
 
   cygwin = filterDoubles predicates.isCygwin;
   darwin = filterDoubles predicates.isDarwin;
+  macosx = filterDoubles predicates.isMacOS;
   freebsd = filterDoubles predicates.isFreeBSD;
   # Should be better, but MinGW is unclear.
   gnu =

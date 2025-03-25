@@ -4331,14 +4331,16 @@ rec {
 
       # This doesn't appear to be officially documented anywhere yet.
       # See https://github.com/rust-lang-nursery/rust-forge/issues/101.
-      os = if stdenv.hostPlatform.isDarwin then "macos" else stdenv.hostPlatform.parsed.kernel.name;
-      arch = stdenv.hostPlatform.parsed.cpu.name;
-      family = "unix";
-      env = "gnu";
+      os = stdenv.hostPlatform.rust.os;
+      arch = stdenv.hostPlatform.rust.arch;
+      family = stdenv.hostPlatform.rust.target-family;
+      env = lib.optionalString (
+        stdenv.hostPlatform.parsed.abi.name != "unknown"
+      ) stdenv.hostPlatform.parsed.abi.name;
       endian =
         if stdenv.hostPlatform.parsed.cpu.significantByte.name == "littleEndian" then "little" else "big";
       pointer_width = toString stdenv.hostPlatform.parsed.cpu.bits;
-      vendor = stdenv.hostPlatform.parsed.vendor.name;
+      vendor = stdenv.hostPlatform.rust.vendor;
       debug_assertions = false;
     };
 

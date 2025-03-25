@@ -13,7 +13,7 @@
 }:
 let
   hostPlatform = stdenvNoCC.hostPlatform;
-  nodePlatform = hostPlatform.parsed.kernel.name; # nodejs's `process.platform`
+  nodePlatform = if hostPlatform.isDarwin then "darwin" else hostPlatform.parsed.kernel.name; # nodejs's `process.platform`
   nodeArch = # nodejs's `process.arch`
     {
       "x86_64" = "x64";

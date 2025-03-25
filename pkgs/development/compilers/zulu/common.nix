@@ -39,7 +39,7 @@ let
 
   platform =
     {
-      "darwin" = "macosx";
+      "macosx" = "macosx";
       "linux" = "linux";
     }
     .${stdenv.hostPlatform.parsed.kernel.name}

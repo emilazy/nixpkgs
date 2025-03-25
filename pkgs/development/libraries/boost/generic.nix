@@ -128,7 +128,9 @@ let
             else
               toString stdenv.hostPlatform.parsed.kernel.execFormat.name
           }"
-          "target-os=${toString stdenv.hostPlatform.parsed.kernel.name}"
+          "target-os=${
+            if stdenv.hostPlatform.isDarwin then "darwin" else toString stdenv.hostPlatform.parsed.kernel.name
+          }"
 
           # adapted from table in boost manual
           # https://www.boost.org/doc/libs/1_66_0/libs/context/doc/html/context/architectures.html

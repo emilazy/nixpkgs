@@ -55,7 +55,7 @@ stdenv.mkDerivation (
       "platform=${
         {
           linux = "unix";
-          darwin = "osx";
+          macosx = "osx";
           windows = "win";
         }
         .${stdenv.hostPlatform.parsed.kernel.name} or stdenv.hostPlatform.parsed.kernel.name
