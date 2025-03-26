@@ -295,13 +295,17 @@ rec {
   };
 
   aarch64-darwin = {
-    config = "arm64-apple-darwin";
+    # Keep the kernel version in sync with the default
+    # `darwinMinVersion` in `default.nix`.
+    config = "arm64-apple-darwin20.4";
     xcodePlatform = "MacOSX";
     platform = { };
   };
 
   x86_64-darwin = {
-    config = "x86_64-apple-darwin";
+    # Keep the kernel version in sync with the default
+    # `darwinMinVersion` in `default.nix`.
+    config = "x86_64-apple-darwin20.4";
     xcodePlatform = "MacOSX";
     platform = { };
   };

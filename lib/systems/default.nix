@@ -342,6 +342,8 @@ let
               null;
           # The canonical name for this attribute is darwinSdkVersion, but some
           # platforms define the old name "sdkVer".
+          #
+          # Keep this in sync with the kernel version in `examples.nix`.
           darwinSdkVersion = final.sdkVer or "11.3";
           darwinMinVersion = final.darwinSdkVersion;
           darwinMinVersionVariable =
