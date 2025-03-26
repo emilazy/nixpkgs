@@ -139,20 +139,10 @@ in
 
 ## Darwin
 
-# Fixes detection of Darwin on x86_64-darwin. Otherwise, GCC uses a deployment target of 10.5, which crashes ld64.
-++ optional (
-  atLeast14 && stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isx86_64
-) ../patches/14/libgcc-darwin-detection.patch
-
 # Fix detection of bootstrap compiler Ada support (cctools as) on Nix Darwin
 ++ optional (
   atLeast12 && stdenv.hostPlatform.isDarwin && langAda
 ) ./ada-cctools-as-detection-configure.patch
-
-# Remove CoreServices on Darwin, as it is only needed for macOS SDK 14+
-++ optional (
-  atLeast14 && stdenv.hostPlatform.isDarwin && langAda
-) ../patches/14/gcc-darwin-remove-coreservices.patch
 
 # Use absolute path in GNAT dylib install names on Darwin
 ++ optionals (stdenv.hostPlatform.isDarwin && langAda) (
