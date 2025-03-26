@@ -48,9 +48,6 @@ stdenv.mkDerivation rec {
     lib.optionals (curses-library.pname == "ncurses") [
       ./link-against-ncurses.patch
     ]
-    ++ [
-      ./no-arch_only-8.2.patch
-    ]
     ++ upstreamPatches
     ++ lib.optionals stdenv.hostPlatform.isWindows [
       (fetchpatch {

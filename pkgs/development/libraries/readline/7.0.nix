@@ -41,7 +41,6 @@ stdenv.mkDerivation rec {
 
   patches = [
     ./link-against-ncurses.patch
-    ./no-arch_only-6.3.patch
   ] ++ upstreamPatches;
 
   meta = with lib; {
