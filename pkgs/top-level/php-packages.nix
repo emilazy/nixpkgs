@@ -31,7 +31,6 @@
   openldap,
   openssl_1_1,
   openssl,
-  overrideSDK,
   pam,
   pcre2,
   bison,
@@ -284,17 +283,15 @@ lib.makeScope pkgs.newScope (
 
         couchbase = callPackage ../development/php-packages/couchbase { };
 
-        datadog_trace = callPackage ../development/php-packages/datadog_trace {
-          buildPecl = buildPecl.override {
-            stdenv = if stdenv.hostPlatform.isDarwin then overrideSDK stdenv "11.0" else stdenv;
-          };
-        };
+        datadog_trace = callPackage ../development/php-packages/datadog_trace { };
 
         decimal = callPackage ../development/php-packages/decimal { };
 
         ds = callPackage ../development/php-packages/ds { };
 
         event = callPackage ../development/php-packages/event { };
+
+        excimer = callPackage ../development/php-packages/excimer { };
 
         gnupg = callPackage ../development/php-packages/gnupg { };
 
