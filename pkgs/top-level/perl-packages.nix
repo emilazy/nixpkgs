@@ -26580,10 +26580,10 @@ with self;
 
     # FIXME: try with libGL + libGLU instead of libGLU libGL
     buildInputs = [
-      pkgs.libGLU
-      pkgs.libGL
-      pkgs.libGLU
-      pkgs.libglut
+      pkgs.mesa_glu
+      pkgs.libGLX
+      pkgs.mesa_glu
+      pkgs.freeglut
       pkgs.xorg.libX11
       pkgs.xorg.libXi
       pkgs.xorg.libXmu
