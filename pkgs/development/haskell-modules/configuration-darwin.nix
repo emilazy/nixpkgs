@@ -167,7 +167,6 @@ self: super:
 
     FractalArt = overrideCabal (drv: {
       librarySystemDepends = [
-        darwin.libobjc
       ] ++ (drv.librarySystemDepends or [ ]);
     }) super.FractalArt;
 

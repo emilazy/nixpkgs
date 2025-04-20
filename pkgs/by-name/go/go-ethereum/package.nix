@@ -1,9 +1,7 @@
 {
   lib,
-  stdenv,
   buildGoModule,
   fetchFromGitHub,
-  libobjc,
   nixosTests,
 }:
 
@@ -59,9 +57,6 @@ buildGoModule rec {
   tags = [ "urfave_cli_no_docs" ];
 
   # Fix for usb-related segmentation faults on darwin
-  propagatedBuildInputs = lib.optionals stdenv.hostPlatform.isDarwin [
-    libobjc
-  ];
 
   passthru.tests = { inherit (nixosTests) geth; };
 
