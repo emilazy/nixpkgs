@@ -6546,9 +6546,7 @@ with pkgs;
   };
   # smlnjBootstrap should be redundant, now that smlnj works on Darwin natively
   smlnjBootstrap = callPackage ../development/compilers/smlnj/bootstrap.nix { };
-  smlnj = callPackage ../development/compilers/smlnj {
-    inherit (darwin) Libsystem;
-  };
+  smlnj = callPackage ../development/compilers/smlnj { };
 
   sqlx-cli = callPackage ../development/tools/rust/sqlx-cli { };
 
