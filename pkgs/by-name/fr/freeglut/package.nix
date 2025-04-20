@@ -38,9 +38,6 @@ stdenv.mkDerivation (finalAttrs: {
   ];
 
   cmakeFlags = lib.optionals stdenv.hostPlatform.isDarwin [
-    "-DOPENGL_INCLUDE_DIR=${libGLX.dev}/include"
-    "-DOPENGL_gl_LIBRARY:FILEPATH=${libGLX}/lib/libGL.dylib"
-    "-DOPENGL_glu_LIBRARY:FILEPATH=${libGLU}/lib/libGLU.dylib"
     "-DFREEGLUT_BUILD_DEMOS:BOOL=OFF"
     "-DFREEGLUT_BUILD_STATIC:BOOL=OFF"
   ];
