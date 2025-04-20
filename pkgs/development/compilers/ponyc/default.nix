@@ -16,8 +16,6 @@
   replaceVars,
   which,
   z3,
-  cctools,
-  darwin,
 }:
 
 stdenv.mkDerivation (rec {
@@ -54,23 +52,19 @@ stdenv.mkDerivation (rec {
     which
     python3
     git
-  ] ++ lib.optionals (stdenv.hostPlatform.isDarwin) [ cctools ];
+  ];
 
   buildInputs = [
     libxml2
     z3
   ];
 
-  patches =
-    [
-      # Sandbox disallows network access, so disabling problematic networking tests
-      ./disable-networking-tests.patch
-    ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [
-      (replaceVars ./fix-darwin-build.patch {
-        libSystem = darwin.Libsystem;
-      })
-    ];
+  patches = [
+    # Sandbox disallows network access, so disabling problematic networking tests
+    ./disable-networking-tests.patch
+
+    ./fix-darwin-build.patch
+  ];
 
   postUnpack = ''
     mkdir -p $NIX_BUILD_TOP/deps
