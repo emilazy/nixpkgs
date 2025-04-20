@@ -4,7 +4,7 @@
   fetchFromGitHub,
   cmake,
   curl,
-  darwin,
+  apple-sdk,
   fftwSinglePrec,
   netcdf,
   pcre,
@@ -35,7 +35,7 @@ stdenv.mkDerivation (finalAttrs: {
       lib.optionalString stdenv.cc.isClang "-Wno-implicit-function-declaration "
       + lib.optionalString (
         stdenv.hostPlatform.isDarwin
-        && lib.versionOlder (darwin.apple_sdk.MacOSX-SDK.version or darwin.apple_sdk.sdk.version) "13.3"
+        && lib.versionOlder apple-sdk.version "13.3"
       ) "-D__LAPACK_int=int";
   };
 
