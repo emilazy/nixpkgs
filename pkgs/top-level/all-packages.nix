@@ -9634,9 +9634,7 @@ with pkgs;
 
   libusb-compat-0_1 = callPackage ../development/libraries/libusb-compat/0.1.nix { };
 
-  libusb1 = callPackage ../development/libraries/libusb1 {
-    inherit (darwin) libobjc;
-  };
+  libusb1 = callPackage ../development/libraries/libusb1 { };
 
   libunicode = callPackage ../by-name/li/libunicode/package.nix {
     stdenv = if stdenv.hostPlatform.isDarwin then llvmPackages_17.stdenv else stdenv;
